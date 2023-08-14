@@ -1,5 +1,12 @@
 package com.example.rideshare;
 
+import static android.content.Intent.createChooser;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -31,11 +38,24 @@ public class ProfileInfo extends AppCompatActivity {
         saving=findViewById(R.id.saving);
         uploadlicense=findViewById(R.id.uploadlicense);
         uploadedornot=findViewById(R.id.uploadedornot);
+        browse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectImage();
+            }
+        });
         saving.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(ProfileInfo.this,HomePage.class));
             }
         });
+    }
+
+    private void selectImage() {
+//        Intent intent=new Intent();
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(intent,createChooser(intent,"Select Image"),PICK_IMAGE_REQUEST);
     }
 }
