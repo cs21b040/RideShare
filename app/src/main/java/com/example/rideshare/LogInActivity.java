@@ -31,19 +31,19 @@ public class LogInActivity extends AppCompatActivity {
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LogInActivity.this,HomePage.class));
+                startActivity(new Intent(LogInActivity.this, OptionsActivity.class));
             }
         });
         signinwithgoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LogInActivity.this,HomePage.class));
+                startActivity(new Intent(LogInActivity.this, OptionsActivity.class));
             }
         });
         signinwithfb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LogInActivity.this,HomePage.class));
+                startActivity(new Intent(LogInActivity.this, OptionsActivity.class));
             }
         });
     }

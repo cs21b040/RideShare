@@ -16,6 +16,12 @@
             android:name=".HomePage"
             android:exported="false" />
         <activity
+            android:name=".ProfileInfo"
+            android:exported="false" />
+        <activity
+            android:name=".OptionsActivity"
+            android:exported="false" />
+        <activity
             android:name=".SignUpActivity"
             android:exported="false" />
         <activity

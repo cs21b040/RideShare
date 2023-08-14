@@ -31,19 +31,19 @@ public class SignUpActivity extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SignUpActivity.this,HomePage.class));
+                startActivity(new Intent(SignUpActivity.this, OptionsActivity.class));
             }
         });
         signupwithgoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SignUpActivity.this,HomePage.class));
+                startActivity(new Intent(SignUpActivity.this, OptionsActivity.class));
             }
         });
         signupwithfb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SignUpActivity.this,HomePage.class));
+                startActivity(new Intent(SignUpActivity.this, OptionsActivity.class));
             }
         });
     }
