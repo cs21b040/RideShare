@@ -4,30 +4,32 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.os.Handler;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-    private Button logIn,signUp;
+    TextView wel,learning;
+    private static int Splash_timeout=3500;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        getSupportActionBar().show();
-        logIn = findViewById(R.id.logIn);
-        signUp = findViewById(R.id.signUp);
-        logIn.setOnClickListener(new View.OnClickListener() {
+        wel=findViewById(R.id.textview1);
+        learning=findViewById(R.id.textview2);
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-
-                startActivity(new Intent(MainActivity.this,LogInActivity.class));
+            public void run() {
+                Intent splashintent=new Intent(MainActivity.this, AnimationActivity.class);
+                startActivity(splashintent);
+                finish();
             }
-        });
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,SignUpActivity.class));
-            }
-        });
+        },Splash_timeout);
+        Animation myanimation= AnimationUtils.loadAnimation(MainActivity.this,R.anim.animat2);
+        wel.startAnimation(myanimation);
+        Animation myanimation2= AnimationUtils.loadAnimation(MainActivity.this,R.anim.animat1);
+        learning.startAnimation(myanimation2);
     }
 }
