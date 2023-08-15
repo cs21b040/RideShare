@@ -26,7 +26,6 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText password;
     private Button signup;
     private Button signupwithgoogle;
-    private Button signupwithfb;
     private FirebaseAuth auth;
 
     @Override
@@ -36,7 +35,6 @@ public class SignUpActivity extends AppCompatActivity {
         textView=findViewById(R.id.textView);
         signup=findViewById(R.id.signup);
         signupwithgoogle=findViewById(R.id.signupwithgoogle);
-        signupwithfb=findViewById(R.id.signupwithfb);
         name=findViewById(R.id.name);
         email=findViewById(R.id.email);
         password=findViewById(R.id.password);
@@ -55,10 +53,7 @@ public class SignUpActivity extends AppCompatActivity {
                 String useremail= email.getText().toString();
                 String userpassword= password.getText().toString();
                 if (username.isEmpty() || useremail.isEmpty() || userpassword.isEmpty()) {
-                    Toast.makeText(SignUpActivity.this, "Invalid Credentials.. Please Try Again", Toast.LENGTH_SHORT).show();
-                }
-                else if(userpassword.length()<6) {
-                    Toast.makeText(SignUpActivity.this, "Password should be atleast 6 characters long", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "Please Enter All Details", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     auth.createUserWithEmailAndPassword(useremail, userpassword).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
@@ -78,12 +73,6 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
         signupwithgoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(SignUpActivity.this, OptionsActivity.class));
-            }
-        });
-        signupwithfb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(SignUpActivity.this, OptionsActivity.class));

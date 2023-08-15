@@ -10,12 +10,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical"
+        android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints">
 
         <EditText
@@ -64,12 +65,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Sign In with Google" />
-
-        <Button
-            android:id="@+id/signinwithfb"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sign In with FB" />
 
     </LinearLayout>
 

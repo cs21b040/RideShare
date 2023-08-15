@@ -63,12 +63,6 @@
             android:layout_height="wrap_content"
             android:text="Sign Up With Google" />
 
-        <Button
-            android:id="@+id/signupwithfb"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sign Up With FB" />
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
