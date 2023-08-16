@@ -18,7 +18,6 @@ public class AnimationActivity extends AppCompatActivity {
         logIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 startActivity(new Intent(AnimationActivity.this,LogInActivity.class));
             }
         });

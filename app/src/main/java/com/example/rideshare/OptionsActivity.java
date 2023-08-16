@@ -21,12 +21,14 @@ public class OptionsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(OptionsActivity.this,ProfileInfo.class));
+                finish();
             }
         });
         shareride.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(OptionsActivity.this,HomePage.class));
+                finish();
             }
         });
     }

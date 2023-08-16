@@ -51,7 +51,6 @@ public class LogInActivity extends AppCompatActivity {
         password=findViewById(R.id.password);
         auth= FirebaseAuth.getInstance();
         database= FirebaseDatabase.getInstance();
-
         GoogleSignInOptions gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         mGoogleSignInClient= GoogleSignIn.getClient(this,gso);
@@ -60,6 +59,7 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(LogInActivity.this,SignUpActivity.class));
+                finish();
             }
         });
         signin.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +85,6 @@ public class LogInActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor=sharedPreferences.edit();
                         editor.putBoolean("hasLoggedIn",true);
                         editor.commit();
-
                         startActivity(new Intent(LogInActivity.this, OptionsActivity.class));
                         finish();
                     }
@@ -120,6 +119,7 @@ public class LogInActivity extends AppCompatActivity {
                 task.getResult(ApiException.class);
                 finish();
                 startActivity(new Intent(LogInActivity.this, OptionsActivity.class));
+                finish();
             }
             catch (ApiException e) {
                 if (e.getStatusCode() == GoogleSignInStatusCodes.SIGN_IN_REQUIRED) {
