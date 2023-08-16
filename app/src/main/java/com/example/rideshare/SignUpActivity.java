@@ -18,6 +18,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
 
 public class SignUpActivity extends AppCompatActivity {
     private TextView textView;
@@ -29,6 +34,8 @@ public class SignUpActivity extends AppCompatActivity {
     private Button signup;
     private Button signupwithgoogle;
     private FirebaseAuth auth;
+    private FirebaseFirestore fstore;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,7 @@ public class SignUpActivity extends AppCompatActivity {
         pno=findViewById(R.id.pno);
         aadhaarnumber=findViewById(R.id.aadhaarnumber);
         auth= FirebaseAuth.getInstance();
+        fstore= FirebaseFirestore.getInstance();
 
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +64,9 @@ public class SignUpActivity extends AppCompatActivity {
                 String username= name.getText().toString();
                 String useremail= email.getText().toString();
                 String userpassword= password.getText().toString();
+                String userpno= pno.getText().toString();
+                String useraadhaarnumber= aadhaarnumber.getText().toString();
+
                 if (username.isEmpty() || useremail.isEmpty() || userpassword.isEmpty()) {
                     Toast.makeText(SignUpActivity.this, "Please Enter All Details", Toast.LENGTH_SHORT).show();
                 }
@@ -64,7 +75,28 @@ public class SignUpActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(SignUpActivity.this, "SignUp Successful", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignUpActivity.this, "Account Created", Toast.LENGTH_SHORT).show();
+                                HashMap<String, Object> user = new HashMap<>();
+                                String userId= auth.getCurrentUser().getUid();
+                                DocumentReference documentReference = fstore.collection("users").document(userId);
+
+                                user.put("name", username);
+                                user.put("email", useremail);
+                                user.put("password", userpassword);
+                                user.put("pno", userpno);
+                                user.put("aadhaarnumber", useraadhaarnumber);
+                                user.put("dob", "");
+                                user.put("vehicletype", "");
+                                user.put("vehiclenumber", "");
+                                user.put("dlno", "");
+
+                                documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(SignUpActivity.this, "Data Stored", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                
                                 startActivity(new Intent(SignUpActivity.this, OptionsActivity.class));
                                 finish();
                             }
@@ -73,6 +105,7 @@ public class SignUpActivity extends AppCompatActivity {
                             }
                         }
                     });
+
                 }
             }
         });
