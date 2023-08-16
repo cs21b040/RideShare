@@ -24,6 +24,8 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText name;
     private EditText email;
     private EditText password;
+    private EditText pno;
+    private EditText aadhaarnumber;
     private Button signup;
     private Button signupwithgoogle;
     private FirebaseAuth auth;
@@ -38,6 +40,8 @@ public class SignUpActivity extends AppCompatActivity {
         name=findViewById(R.id.name);
         email=findViewById(R.id.email);
         password=findViewById(R.id.password);
+        pno=findViewById(R.id.pno);
+        aadhaarnumber=findViewById(R.id.aadhaarnumber);
         auth= FirebaseAuth.getInstance();
 
         textView.setOnClickListener(new View.OnClickListener() {
