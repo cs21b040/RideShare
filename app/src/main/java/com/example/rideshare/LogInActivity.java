@@ -26,6 +26,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LogInActivity extends AppCompatActivity {
     private TextView textView;
@@ -34,9 +35,8 @@ public class LogInActivity extends AppCompatActivity {
     private Button signin;
     private Button signinwithgoogle;
     private FirebaseAuth auth;
-    private FirebaseDatabase database;
+    private FirebaseFirestore fstore;
     private GoogleSignInClient mGoogleSignInClient;
-//    private ProgressDialog progressdialog;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class LogInActivity extends AppCompatActivity {
         username=findViewById(R.id.email);
         password=findViewById(R.id.password);
         auth= FirebaseAuth.getInstance();
-        database= FirebaseDatabase.getInstance();
+        fstore= FirebaseFirestore.getInstance();
 
         GoogleSignInOptions gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
