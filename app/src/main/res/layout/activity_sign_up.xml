@@ -44,6 +44,24 @@
             android:inputType="textPassword"
             android:minHeight="48dp" />
 
+        <EditText
+            android:id="@+id/pno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Phone Number"
+            android:inputType="phone"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/aadhaarnumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Aadhaar Card Number"
+            android:inputType="number"
+            android:minHeight="48dp" />
+
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
