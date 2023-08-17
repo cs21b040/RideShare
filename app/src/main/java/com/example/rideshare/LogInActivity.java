@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,16 +27,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LogInActivity extends AppCompatActivity {
+    public static String PREFS_NAME="MyPrefsFile";
     private TextView textView;
     private EditText username;
     private EditText password;
     private Button signin;
     private Button signinwithgoogle;
     private FirebaseAuth auth;
-    private FirebaseFirestore fstore;
+    private FirebaseDatabase database;
     private GoogleSignInClient mGoogleSignInClient;
     @Override
 
@@ -48,8 +49,7 @@ public class LogInActivity extends AppCompatActivity {
         username=findViewById(R.id.email);
         password=findViewById(R.id.password);
         auth= FirebaseAuth.getInstance();
-        fstore= FirebaseFirestore.getInstance();
-
+        database= FirebaseDatabase.getInstance();
         GoogleSignInOptions gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         mGoogleSignInClient= GoogleSignIn.getClient(this,gso);
@@ -58,6 +58,7 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(LogInActivity.this,SignUpActivity.class));
+                finish();
             }
         });
         signin.setOnClickListener(new View.OnClickListener() {
@@ -79,14 +80,18 @@ public class LogInActivity extends AppCompatActivity {
                 auth.signInWithEmailAndPassword(useremail,userpassword).addOnSuccessListener(LogInActivity.this, new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        finish();
+                        SharedPreferences sharedPreferences=getSharedPreferences(LogInActivity.PREFS_NAME,0);
+                        SharedPreferences.Editor editor=sharedPreferences.edit();
+                        editor.putBoolean("hasLoggedIn",true);
+                        editor.commit();
                         startActivity(new Intent(LogInActivity.this, OptionsActivity.class));
+                        finish();
                     }
                 }).addOnFailureListener(LogInActivity.this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         if (e instanceof FirebaseAuthInvalidUserException) {
-                            // This exception is thrown if the account does not exist.
+
                             Toast.makeText(LogInActivity.this, "Account not found. Please sign up.", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(LogInActivity.this, "Sign In Failed. Please Try Again", Toast.LENGTH_SHORT).show();
@@ -113,6 +118,7 @@ public class LogInActivity extends AppCompatActivity {
                 task.getResult(ApiException.class);
                 finish();
                 startActivity(new Intent(LogInActivity.this, OptionsActivity.class));
+                finish();
             }
             catch (ApiException e) {
                 if (e.getStatusCode() == GoogleSignInStatusCodes.SIGN_IN_REQUIRED) {
