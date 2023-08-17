@@ -3,22 +3,18 @@ package com.example.rideshare;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class MainActivity extends AppCompatActivity {
     TextView wel,learning;
-    private static int Splash_timeout=3500;
+    private static int Splash_timeout=2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
 
-                    Intent splashintent=new Intent(MainActivity.this, AnimationActivity.class);
+                    Intent splashintent=new Intent(MainActivity.this, Login.class);
                     startActivity(splashintent);
                     finish();
                 }

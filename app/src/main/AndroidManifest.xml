@@ -16,10 +16,7 @@
             android:name=".ProfilePage"
             android:exported="false" />
         <activity
-            android:name=".AnimationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".animation1"
+            android:name=".Login"
             android:exported="false" />
         <activity
             android:name=".HomePage"
@@ -29,12 +26,6 @@
             android:exported="false" />
         <activity
             android:name=".OptionsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SignUpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".LogInActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

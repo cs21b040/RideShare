@@ -7,9 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -59,9 +57,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
         else if(item.getItemId()==R.id.nav_logout) {
             FirebaseAuth.getInstance().signOut();
-            SharedPreferences sharedPreferences=getSharedPreferences(LogInActivity.PREFS_NAME,0);
+//            SharedPreferences sharedPreferences=getSharedPreferences(LogInActivity.PREFS_NAME,0);
             Toast.makeText(this, "Log Out SuccessFull", Toast.LENGTH_SHORT).show();
-            Intent intent1=new Intent(HomePage.this,AnimationActivity.class);
+            Intent intent1=new Intent(HomePage.this, Login.class);
             startActivity(intent1);
             finish();
         }
