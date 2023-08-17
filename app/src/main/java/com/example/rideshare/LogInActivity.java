@@ -38,7 +38,6 @@ public class LogInActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseDatabase database;
     private GoogleSignInClient mGoogleSignInClient;
-//    private ProgressDialog progressdialog;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +91,7 @@ public class LogInActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         if (e instanceof FirebaseAuthInvalidUserException) {
-                            // This exception is thrown if the account does not exist.
+
                             Toast.makeText(LogInActivity.this, "Account not found. Please sign up.", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(LogInActivity.this, "Sign In Failed. Please Try Again", Toast.LENGTH_SHORT).show();

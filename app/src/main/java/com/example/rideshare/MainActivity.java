@@ -12,11 +12,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 public class MainActivity extends AppCompatActivity {
     TextView wel,learning;
     private static int Splash_timeout=3500;
-    public static boolean hasLoggedIn=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,23 +26,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         wel=findViewById(R.id.textview1);
         learning=findViewById(R.id.textview2);
+        String s= FirebaseAuth.getInstance().getUid();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.e("HelloHi", "run: "+hasLoggedIn);
-                SharedPreferences sharedPreferences =getSharedPreferences(LogInActivity.PREFS_NAME,0);
-                hasLoggedIn=sharedPreferences.getBoolean("hasLoggedIn",false);
 
-                if(hasLoggedIn!=false)
+                if(s!=null)
                 {
-                    Toast.makeText(MainActivity.this, "hasLoggedIn = true", Toast.LENGTH_SHORT).show();
                     Intent intent =new Intent(MainActivity.this,OptionsActivity.class);
                     startActivity(intent);
                     finish();
                 }
                 else {
 
-                    Toast.makeText(MainActivity.this, "HasLoggedIn = false", Toast.LENGTH_SHORT).show();
                     Intent splashintent=new Intent(MainActivity.this, AnimationActivity.class);
                     startActivity(splashintent);
                     finish();

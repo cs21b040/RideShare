@@ -62,9 +62,6 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             SharedPreferences sharedPreferences=getSharedPreferences(LogInActivity.PREFS_NAME,0);
             Toast.makeText(this, "Log Out SuccessFull", Toast.LENGTH_SHORT).show();
             Intent intent1=new Intent(HomePage.this,AnimationActivity.class);
-            SharedPreferences.Editor editor=sharedPreferences.edit();
-            editor.putBoolean("hasLoggedIn",true);
-            editor.commit();
             startActivity(intent1);
             finish();
         }
