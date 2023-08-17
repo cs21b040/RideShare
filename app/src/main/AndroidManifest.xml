@@ -16,10 +16,10 @@
             android:name=".ProfilePage"
             android:exported="false" />
         <activity
-            android:name=".AnimationActivity"
+            android:name=".Login"
             android:exported="false" />
         <activity
-            android:name=".animation1"
+            android:name=".ViewPagerAdapter"
             android:exported="false" />
         <activity
             android:name=".HomePage"
@@ -31,10 +31,10 @@
             android:name=".OptionsActivity"
             android:exported="false" />
         <activity
-            android:name=".SignUpActivity"
+            android:name=".SignUpFragment"
             android:exported="false" />
         <activity
-            android:name=".LogInActivity"
+            android:name=".LoginFragment"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
