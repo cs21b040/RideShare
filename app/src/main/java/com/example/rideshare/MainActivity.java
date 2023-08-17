@@ -9,9 +9,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
+
 public class MainActivity extends AppCompatActivity {
     TextView wel,learning;
-    private static int Splash_timeout=3500;
+    private static int Splash_timeout=2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,12 +22,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         wel=findViewById(R.id.textview1);
         learning=findViewById(R.id.textview2);
+        String s= FirebaseAuth.getInstance().getUid();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent splashintent=new Intent(MainActivity.this, AnimationActivity.class);
-                startActivity(splashintent);
-                finish();
+
+                if(s!=null)
+                {
+                    Intent intent =new Intent(MainActivity.this,OptionsActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                else {
+
+                    Intent splashintent=new Intent(MainActivity.this, Login.class);
+                    startActivity(splashintent);
+                    finish();
+                }
             }
         },Splash_timeout);
         Animation myanimation= AnimationUtils.loadAnimation(MainActivity.this,R.anim.animat2);
