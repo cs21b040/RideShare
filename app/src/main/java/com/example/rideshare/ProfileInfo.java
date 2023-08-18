@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,12 +43,16 @@ public class ProfileInfo extends AppCompatActivity {
                 String usertype= vehicletype.getText().toString();
                 String usernumber= vehiclenumber.getText().toString();
                 String userdln= dln.getText().toString();
+                if(userdob.isEmpty() || usertype.isEmpty() || usernumber.isEmpty() || userdln.isEmpty()){
+                    Toast.makeText(ProfileInfo.this, "Please enter all the details", Toast.LENGTH_SHORT).show();
+                }
                 documentReference.update("dob",userdob);
                 documentReference.update("vehicletype",usertype);
                 documentReference.update("vehiclenumber",usernumber);
                 documentReference.update("dlno",userdln);
 
                 startActivity(new Intent(ProfileInfo.this,HomePage.class));
+                finish();
             }
         });
     }
