@@ -44,6 +44,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.1.1")
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation ("com.google.maps.android:android-maps-utils:2.2.1")
     implementation("com.google.firebase:firebase-firestore-ktx:24.7.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     testImplementation("junit:junit:4.13.2")
