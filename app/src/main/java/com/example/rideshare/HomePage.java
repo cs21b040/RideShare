@@ -230,6 +230,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             if(total_dist>dist*10){
                 //show the driver in the list
                 //remove this polyLine after completion
+                Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
             }
         }
     }
