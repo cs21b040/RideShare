@@ -9,7 +9,7 @@
         android:id="@+id/Ride_heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/baloo"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/rideshare"
         android:textSize="34sp"
         app:layout_constraintBottom_toBottomOf="parent"

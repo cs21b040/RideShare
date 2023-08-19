@@ -38,7 +38,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/menu" />
 
-                <fragment
+        <fragment
             android:id="@+id/autocomplete_fragment"
             android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
             android:layout_width="match_parent"
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="56dp"
             android:width="200dp"
-            android:fontFamily="@font/baloo"
+            android:fontFamily="sans-serif"
             android:text="Search"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +69,7 @@
             android:layout_marginTop="76dp"
             android:width="250dp"
             android:ems="10"
-            android:fontFamily="@font/baloo"
+            android:fontFamily="sans-serif"
             android:hint="From"
             android:imeOptions="actionSearch"
             android:inputType="text"
