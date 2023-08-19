@@ -35,6 +35,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-maps:18.1.0")
     implementation ("com.google.android.gms:play-services-places:15.0.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation ("com.google.maps:google-maps-services:2.2.0")
     implementation("com.google.android.libraries.places:places:3.1.0")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

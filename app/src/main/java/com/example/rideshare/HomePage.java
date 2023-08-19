@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -26,6 +28,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -36,6 +40,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -46,6 +52,12 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.maps.DirectionsApi;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PendingResult;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TravelMode;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -53,7 +65,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 
 public class HomePage extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
 
@@ -65,6 +76,8 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     AutoCompleteTextView source;
     AutoCompleteTextView destination;
     private Boolean mLocationPermissionsGranted = false;
+    Place src,dst;
+    Button button;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 136));
@@ -100,20 +113,21 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         PlacesClient placesClient= Places.createClient(this);
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
-                new LatLng(13.65,79.42),
-                new LatLng(13.65,79.42)));
+        AutocompleteSupportFragment autocompleteFragment2 = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment2);
         autocompleteFragment.setCountries("IN");
-
+        autocompleteFragment2.setCountries("IN");
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
-
+        autocompleteFragment2.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+                src=place;
+                geoLocate();
             }
             @Override
             public void onError(@NonNull Status status) {
@@ -121,30 +135,70 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
+        autocompleteFragment2.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onError(@androidx.annotation.NonNull Status status) {
+                Log.i(TAG, "An error occurred: " + status);
+            }
+
+            @Override
+            public void onPlaceSelected(@androidx.annotation.NonNull Place place) {
+                dst=place;
+            }
+        });
+        button=findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDirection();
+            }
+        });
 
     }
-    private void searchCity(){
-        Log.d(TAG, "init: initializing");
-        source = (AutoCompleteTextView) findViewById(R.id.source);
-//        source.setAdapter(AutocompleteSupportFragment);
-        source.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
-                    geoLocate();
-                }
 
-                return false;
+    private void getDirection(){
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+        boundsBuilder.include(src.getLatLng());
+        boundsBuilder.include(dst.getLatLng());
+        LatLngBounds bounds = boundsBuilder.build();
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+        fetchAndDisplayRoute();
+    }
+    private void fetchAndDisplayRoute() {
+        GeoApiContext context = new GeoApiContext.Builder()
+                .apiKey(getString(R.string.my_api_key)) // Replace with your API key
+                .build();
+
+        DirectionsApiRequest req = DirectionsApi.newRequest(context)
+                .origin(new com.google.maps.model.LatLng(src.getLatLng().latitude, src.getLatLng().longitude))
+                .destination(new com.google.maps.model.LatLng(dst.getLatLng().latitude, dst.getLatLng().longitude))
+                .mode(TravelMode.DRIVING);
+
+        req.setCallback(new PendingResult.Callback<DirectionsResult>() {
+            @Override
+            public void onResult(DirectionsResult result) {
+                runOnUiThread(() -> {
+                    PolylineOptions polylineOptions = new PolylineOptions()
+                            .color(Color.BLUE)
+                            .width(8);
+
+                    for (com.google.maps.model.LatLng point : result.routes[0].overviewPolyline.decodePath()) {
+                        polylineOptions.add(new LatLng(point.lat, point.lng));
+                    }
+
+                    Polyline polyline = map.addPolyline(polylineOptions);
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                // Handle error
             }
         });
     }
-
     private void geoLocate() {
         Log.d(TAG, "geoLocate: geolocating");
-        String searchString = source.getText().toString();
+        String searchString = src.getName();
         Geocoder geocoder = new Geocoder(HomePage.this);
         List<Address> list = new ArrayList<>();
         try{
@@ -240,7 +294,6 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             }
             map.setMyLocationEnabled(true);
             map.getUiSettings().setMyLocationButtonEnabled(false);
-            searchCity();
         }
     }
     private void getLocationPermission() {
