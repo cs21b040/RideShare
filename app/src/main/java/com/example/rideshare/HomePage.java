@@ -11,13 +11,10 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -28,8 +25,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -46,7 +41,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
@@ -56,6 +50,7 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
+import com.google.maps.android.PolyUtil;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
 
@@ -65,6 +60,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HomePage extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
 
@@ -82,9 +79,11 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 136));
 
-
+    Vector<Polyline> v;
+    private final double RADIUS_OF_EARTH=6378.1e3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        v=new Vector<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -115,11 +114,15 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         AutocompleteSupportFragment autocompleteFragment2 = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment2);
+        AutocompleteSupportFragment autocompleteFragment3 = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment3);
         autocompleteFragment.setCountries("IN");
         autocompleteFragment2.setCountries("IN");
+        autocompleteFragment3.setCountries("IN");
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
         autocompleteFragment2.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
+        autocompleteFragment3.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -144,6 +147,18 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             @Override
             public void onPlaceSelected(@androidx.annotation.NonNull Place place) {
                 dst=place;
+            }
+        });
+        autocompleteFragment3.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onError(@androidx.annotation.NonNull Status status) {
+                Log.i(TAG, "An error occurred: " + status);
+            }
+
+            @Override
+            public void onPlaceSelected(@androidx.annotation.NonNull Place place) {
+                Log.i("PLACETEMP", "Place: " + place.getName() + ", " + place.getLatLng().latitude +" "+ place.getLatLng().longitude);
+                check(place);
             }
         });
         button=findViewById(R.id.button);
@@ -173,6 +188,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                 .origin(new com.google.maps.model.LatLng(src.getLatLng().latitude, src.getLatLng().longitude))
                 .destination(new com.google.maps.model.LatLng(dst.getLatLng().latitude, dst.getLatLng().longitude))
                 .mode(TravelMode.DRIVING);
+        ;
 
         req.setCallback(new PendingResult.Callback<DirectionsResult>() {
             @Override
@@ -185,8 +201,9 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                     for (com.google.maps.model.LatLng point : result.routes[0].overviewPolyline.decodePath()) {
                         polylineOptions.add(new LatLng(point.lat, point.lng));
                     }
-
                     Polyline polyline = map.addPolyline(polylineOptions);
+                    v.add(polyline);
+
                 });
             }
 
@@ -195,6 +212,27 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                 // Handle error
             }
         });
+
+    }
+    void check(Place place){
+        if(v.size()>0){
+            double dist=1e9;
+            double total_dist=haversine(place.getLatLng(),dst.getLatLng());
+            for(int i=0;i<v.size();i++){
+                Polyline p=v.get(i);
+                Log.i(TAG, "size: "+p.getPoints().size());
+                for(int j=0;j<p.getPoints().size();j++){
+                    double cur_dist=haversine(place.getLatLng(),p.getPoints().get(j));
+                    dist=Math.min(dist,cur_dist);
+                }
+            }
+            Log.i("PLACETEMP", "check: "+dist );
+            if(total_dist>dist*10){
+                //show the driver in the list
+                //remove this polyLine after completion
+                Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
     private void geoLocate() {
         Log.d(TAG, "geoLocate: geolocating");
@@ -273,6 +311,23 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage() );
         }
     }
+    public double haversine(LatLng p1, LatLng p2) {
+        double lat1 = p1.latitude;
+        double lon1 = p1.longitude;
+        double lat2 = p2.latitude;
+        double lon2 = p2.longitude;
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return RADIUS_OF_EARTH * c; // RADIUS_OF_EARTH is the Earth's radius in your desired units
+    }
+
     private void moveCamera(LatLng latLng, float zoom,String title){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
