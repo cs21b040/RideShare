@@ -107,18 +107,20 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
     void check(){
         Log.i("CHECK SIZe", "check: v size is" + v.size());
         if(v.size()>0){
-            double dist=1e9;
+            double dist1=1e9;
+            double dist2=1e9;
             double total_dist=haversine(src.getLatLng(),dst.getLatLng());
             for(int i=0;i<v.size();i++){
                 Polyline p=v.get(i);
                 Log.i(TAG, "size: "+p.getPoints().size());
                 for(int j=0;j<p.getPoints().size();j++){
-                    double cur_dist=haversine(dst.getLatLng(),p.getPoints().get(j));
-                    dist=Math.min(dist,cur_dist);
+                    double cur_dist1=haversine(src.getLatLng(),p.getPoints().get(j));
+                    double cur_dist2=haversine(dst.getLatLng(),p.getPoints().get(j));
+                    dist1=Math.min(dist1,cur_dist1);
+                    dist2=Math.min(dist2,cur_dist2);
                 }
             }
-            Log.i("PLACETEMP", "check: "+dist );
-            if(total_dist>dist*10){
+            if(total_dist>dist1*10 && total_dist>dist2*10){
                 //show the driver in the list
                 //remove this polyLine after completion
                 Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
@@ -173,5 +175,3 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         return true;
     }
 }
-
-
