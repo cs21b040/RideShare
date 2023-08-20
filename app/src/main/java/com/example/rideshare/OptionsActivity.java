@@ -56,7 +56,7 @@ public class OptionsActivity extends AppCompatActivity {
         shareride.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(OptionsActivity.this,HomePage.class));
+                startActivity(new Intent(OptionsActivity.this,CustomerHomePage.class));
             }
         });
     }
