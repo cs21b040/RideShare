@@ -2,6 +2,8 @@ package com.example.rideshare;
 
 import static android.content.ContentValues.TAG;
 
+import static com.example.rideshare.HomePage.v;
+
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +22,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -39,7 +43,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
     private GoogleMap map;
     SupportMapFragment mapFragment;
     Button button;
-
+    private final double RADIUS_OF_EARTH=6378.1e3;
     Place src,dst;
     void init(){
         String apiKey = getString(R.string.my_api_key);
@@ -64,6 +68,62 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
             }
         });
+        AutocompleteSupportFragment autocompleteFragment2 = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment2);
+        autocompleteFragment2.setCountries("IN");
+        // Specify the types of place data to return.
+        autocompleteFragment2.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
+        autocompleteFragment2.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onError(@androidx.annotation.NonNull Status status) {
+                Log.i(TAG, "An error occurred: " + status);
+            }
+
+            @Override
+            public void onPlaceSelected(@androidx.annotation.NonNull Place place) {
+                Log.i("PLACETEMP", "Place: " + place.getName() + ", " + place.getLatLng().latitude +" "+ place.getLatLng().longitude);
+                dst=place;
+            }
+        });
+        button=findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                check();
+            }
+        });
+    }
+    public double haversine(LatLng p1, LatLng p2) {
+        double lat1 = p1.latitude;
+        double lon1 = p1.longitude;
+        double lat2 = p2.latitude;
+        double lon2 = p2.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return RADIUS_OF_EARTH * c;
+    }
+    void check(){
+        Log.i("CHECK SIZe", "check: v size is" + v.size());
+        if(v.size()>0){
+            double dist=1e9;
+            double total_dist=haversine(src.getLatLng(),dst.getLatLng());
+            for(int i=0;i<v.size();i++){
+                Polyline p=v.get(i);
+                Log.i(TAG, "size: "+p.getPoints().size());
+                for(int j=0;j<p.getPoints().size();j++){
+                    double cur_dist=haversine(dst.getLatLng(),p.getPoints().get(j));
+                    dist=Math.min(dist,cur_dist);
+                }
+            }
+            Log.i("PLACETEMP", "check: "+dist );
+            if(total_dist>dist*10){
+                //show the driver in the list
+                //remove this polyLine after completion
+                Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override

@@ -79,8 +79,8 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 136));
 
-    Vector<Polyline> v;
-    private final double RADIUS_OF_EARTH=6378.1e3;
+    static Vector<Polyline> v;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         v=new Vector<>();
@@ -114,15 +114,11 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         AutocompleteSupportFragment autocompleteFragment2 = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment2);
-        AutocompleteSupportFragment autocompleteFragment3 = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment3);
         autocompleteFragment.setCountries("IN");
         autocompleteFragment2.setCountries("IN");
-        autocompleteFragment3.setCountries("IN");
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
         autocompleteFragment2.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
-        autocompleteFragment3.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -149,18 +145,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                 dst=place;
             }
         });
-        autocompleteFragment3.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onError(@androidx.annotation.NonNull Status status) {
-                Log.i(TAG, "An error occurred: " + status);
-            }
 
-            @Override
-            public void onPlaceSelected(@androidx.annotation.NonNull Place place) {
-                Log.i("PLACETEMP", "Place: " + place.getName() + ", " + place.getLatLng().latitude +" "+ place.getLatLng().longitude);
-                check(place);
-            }
-        });
         button=findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,7 +188,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                     }
                     Polyline polyline = map.addPolyline(polylineOptions);
                     v.add(polyline);
-
+                    addToDatabase(polyline);
                 });
             }
 
@@ -214,25 +199,8 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         });
 
     }
-    void check(Place place){
-        if(v.size()>0){
-            double dist=1e9;
-            double total_dist=haversine(place.getLatLng(),dst.getLatLng());
-            for(int i=0;i<v.size();i++){
-                Polyline p=v.get(i);
-                Log.i(TAG, "size: "+p.getPoints().size());
-                for(int j=0;j<p.getPoints().size();j++){
-                    double cur_dist=haversine(place.getLatLng(),p.getPoints().get(j));
-                    dist=Math.min(dist,cur_dist);
-                }
-            }
-            Log.i("PLACETEMP", "check: "+dist );
-            if(total_dist>dist*10){
-                //show the driver in the list
-                //remove this polyLine after completion
-                Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
-            }
-        }
+    void addToDatabase(Polyline polyline){
+        //do something chatGPT
     }
     private void geoLocate() {
         Log.d(TAG, "geoLocate: geolocating");
@@ -311,22 +279,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage() );
         }
     }
-    public double haversine(LatLng p1, LatLng p2) {
-        double lat1 = p1.latitude;
-        double lon1 = p1.longitude;
-        double lat2 = p2.latitude;
-        double lon2 = p2.longitude;
 
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return RADIUS_OF_EARTH * c; // RADIUS_OF_EARTH is the Earth's radius in your desired units
-    }
 
     private void moveCamera(LatLng latLng, float zoom,String title){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
