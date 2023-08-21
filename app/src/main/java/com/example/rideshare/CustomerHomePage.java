@@ -1,9 +1,6 @@
 package com.example.rideshare;
 
 import static android.content.ContentValues.TAG;
-
-import static com.example.rideshare.HomePage.v;
-
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -24,6 +20,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -31,10 +29,17 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 public class CustomerHomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     DrawerLayout drawerLayout;
@@ -42,9 +47,33 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
     Toolbar toolbar;
     private GoogleMap map;
     SupportMapFragment mapFragment;
+
     Button button;
     private final double RADIUS_OF_EARTH=6378.1e3;
     Place src,dst;
+    private FirebaseAuth auth;
+    private FirebaseFirestore fstore;
+    Vector<List<LatLng>> allpaths;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_customer_home_page);
+        drawerLayout = findViewById(R.id.drawer_layout1);
+        navigationView = findViewById(R.id.nav_view1);
+        auth = FirebaseAuth.getInstance();
+        fstore = FirebaseFirestore.getInstance();
+        toolbar = findViewById(R.id.toolbar1);
+        setSupportActionBar(toolbar);
+        navigationView.bringToFront();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_home1);
+        retrieveAllPathsFromDatabase();
+        init();
+    }
+
     void init(){
         String apiKey = getString(R.string.my_api_key);
         if(!Places.isInitialized()){
@@ -105,46 +134,56 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         return RADIUS_OF_EARTH * c;
     }
     void check(){
-        Log.i("CHECK SIZe", "check: v size is" + v.size());
-        if(v.size()>0){
+        Log.i("CHECK SIZe", "check: v size is" + allpaths.size());
+        if(allpaths.size()>0){
             double dist1=1e9;
             double dist2=1e9;
             double total_dist=haversine(src.getLatLng(),dst.getLatLng());
-            for(int i=0;i<v.size();i++){
-                Polyline p=v.get(i);
-                Log.i(TAG, "size: "+p.getPoints().size());
-                for(int j=0;j<p.getPoints().size();j++){
-                    double cur_dist1=haversine(src.getLatLng(),p.getPoints().get(j));
-                    double cur_dist2=haversine(dst.getLatLng(),p.getPoints().get(j));
+            for(int i=0;i<allpaths.size();i++){
+                for(int j=0;j<allpaths.get(i).size();j++){
+                    double cur_dist1=haversine(src.getLatLng(),allpaths.get(i).get(j));
+                    double cur_dist2=haversine(dst.getLatLng(),allpaths.get(i).get(j));
                     dist1=Math.min(dist1,cur_dist1);
                     dist2=Math.min(dist2,cur_dist2);
                 }
             }
-            if(total_dist>dist1*10 && total_dist>dist2*10){
+            Log.i("TOTALDIST", "check: "+dist1+" "+dist2+" "+total_dist);
+            if(dist1+dist2<=total_dist){
                 //show the driver in the list
                 //remove this polyLine after completion
                 Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
             }
         }
     }
+    void retrieveAllPathsFromDatabase() {
+        Vector<List<LatLng>> allPaths = new Vector<>();
+        fstore.collection("paths")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@androidx.annotation.NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String,Object>m=document.getData();
+                                for(Map.Entry<String,Object> entry : m.entrySet()){
+                                    List<Map<String,Object>>m2=(List<Map<String, Object>>) entry.getValue();
+                                    List<LatLng>temp=new ArrayList<>();
+                                    for(int i=0;i<m2.size();i++){
+                                        double lat=(double)m2.get(i).get("latitude");
+                                        double lng=(double)m2.get(i).get("longitude");
+                                        temp.add(new LatLng(lat,lng));
+                                    }
+                                    allPaths.add(temp);
+                                }
+                                Log.i("CHECKANDTELL", "onComplete: "+document.getId() + " => " + allPaths.size());
+                            }
+                            Log.i("CHECKANDTELL", "retrieveAllPathsFromDatabase: "+allPaths.size());
+                            allpaths=allPaths;
+                        }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_customer_home_page);
-        drawerLayout = findViewById(R.id.drawer_layout1);
-        navigationView = findViewById(R.id.nav_view1);
-        toolbar = findViewById(R.id.toolbar1);
-        setSupportActionBar(toolbar);
-        navigationView.bringToFront();
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(R.id.nav_home1);
-        init();
+                    }
+                });
     }
-
     @Override
     public void onBackPressed() {
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
@@ -154,7 +193,6 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
             super.onBackPressed();
         }
     }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId()==R.id.nav_home1) {
@@ -175,3 +213,5 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         return true;
     }
 }
+
+

@@ -79,11 +79,9 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 136));
 
-    static Vector<Polyline> v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        v=new Vector<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -187,7 +185,6 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                         polylineOptions.add(new LatLng(point.lat, point.lng));
                     }
                     Polyline polyline = map.addPolyline(polylineOptions);
-                    v.add(polyline);
                     addToDatabase(polyline);
                 });
             }
