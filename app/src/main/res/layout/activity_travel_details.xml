@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical"
+    app:layout_anchorGravity="center_horizontal"
+    tools:context=".Travel_Details">
+
+    <TextView
+        android:id="@+id/profile"
+        android:layout_width="326dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_bkg"
+        android:gravity="center"
+        android:padding="8dp"
+        android:textColor="@color/lavender"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        android:text="Your Trips"/>
+
+    <TextView
+        android:id="@+id/traveler"
+        android:layout_width="262dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edittext_bkg"
+        android:hint="Travelling as: "
+        android:padding="8dp"
+        android:textColor="@color/lavender"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:textColor="@color/lavender"
+        android:textStyle="bold"
+        android:text="Driver's Details" />
+
+    <TextView
+        android:id="@+id/from1"
+        android:layout_marginTop="5dp"
+        android:layout_width="390dp"
+        android:layout_height="35dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:hint="Travelling From:"
+        />
+
+    <TextView
+        android:id="@+id/to1"
+        android:layout_width="390dp"
+        android:layout_height="35dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:hint="Travelling To:" />
+
+    <TextView
+        android:id="@+id/phone1"
+        android:layout_width="390dp"
+        android:layout_height="35dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:hint="Mobile Number: " />
+
+    <TextView
+        android:id="@+id/textView18"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:text="Costumer's Details"
+        android:textColor="@color/lavender"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/from2"
+        android:layout_width="390dp"
+        android:layout_height="35dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:hint="Travelling From:" />
+
+    <TextView
+        android:id="@+id/to2"
+        android:layout_width="390dp"
+        android:layout_height="35dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:hint="Travelling To:" />
+
+    <TextView
+        android:id="@+id/phone2"
+        android:layout_width="390dp"
+        android:layout_height="35dp"
+        android:background="@drawable/edittext_bkg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:hint="Mobile Number: " />
+
+</LinearLayout>

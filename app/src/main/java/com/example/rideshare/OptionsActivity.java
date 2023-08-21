@@ -20,6 +20,7 @@ public class OptionsActivity extends AppCompatActivity {
     private Button shareride;
     private FirebaseAuth auth;
     private FirebaseFirestore fstore;
+    static boolean isDriver= true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,7 @@ public class OptionsActivity extends AppCompatActivity {
         shareride.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isDriver= false;
                 startActivity(new Intent(OptionsActivity.this,CustomerHomePage.class));
             }
         });

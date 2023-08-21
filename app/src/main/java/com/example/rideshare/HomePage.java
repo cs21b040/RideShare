@@ -38,6 +38,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -46,6 +48,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -59,8 +63,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomePage extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
@@ -69,21 +75,24 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     NavigationView navigationView;
     Toolbar toolbar;
     private GoogleMap map;
-    SupportMapFragment mapFragment;
-    AutoCompleteTextView source;
-    AutoCompleteTextView destination;
     private Boolean mLocationPermissionsGranted = false;
     Place src,dst;
     Button button;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 136));
+    private FirebaseAuth auth;
+    private FirebaseFirestore fstore;
 
+    static List<Polyline> v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        v=new LinkedList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+        auth = FirebaseAuth.getInstance();
+        fstore = FirebaseFirestore.getInstance();
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         toolbar = findViewById(R.id.toolbar);
@@ -185,6 +194,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                         polylineOptions.add(new LatLng(point.lat, point.lng));
                     }
                     Polyline polyline = map.addPolyline(polylineOptions);
+                    v.add(polyline);
                     addToDatabase(polyline);
                 });
             }
@@ -196,9 +206,25 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         });
 
     }
-    void addToDatabase(Polyline polyline){
-        //do something chatGPT
+    void addToDatabase(Polyline polyline) {
+        String userId = auth.getCurrentUser().getUid();
+        List<LatLng> points = polyline.getPoints();
+        HashMap<String, Object> path = new HashMap<>();
+        path.put(userId, points);
+        fstore.collection("paths").document().set(path)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(HomePage.this, "Path added to database", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(HomePage.this, "Error adding path to database", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
     private void geoLocate() {
         Log.d(TAG, "geoLocate: geolocating");
         String searchString = src.getName();
