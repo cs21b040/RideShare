@@ -1,9 +1,6 @@
 package com.example.rideshare;
 
 import static android.content.ContentValues.TAG;
-
-import static com.example.rideshare.HomePage.v;
-
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -11,19 +8,22 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -31,20 +31,56 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Vector;
 
 public class CustomerHomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     Toolbar toolbar;
-    private GoogleMap map;
-    SupportMapFragment mapFragment;
+
     Button button;
     private final double RADIUS_OF_EARTH=6378.1e3;
     Place src,dst;
+    private FirebaseAuth auth;
+    private FirebaseFirestore fstore;
+    Vector<List<LatLng>> allpaths;
+    private LinearLayout linearLayout;
+    private ArrayList<String> arrayList,uid;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_customer_home_page);
+        drawerLayout = findViewById(R.id.drawer_layout1);
+        navigationView = findViewById(R.id.nav_view1);
+        auth = FirebaseAuth.getInstance();
+        fstore = FirebaseFirestore.getInstance();
+        toolbar = findViewById(R.id.toolbar1);
+        setSupportActionBar(toolbar);
+        linearLayout=findViewById(R.id.linear_layout);
+        navigationView.bringToFront();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_home1);
+        allpaths=new Vector<>();
+        uid=new ArrayList<>();
+        arrayList=new ArrayList<>();
+        retrieveAllPathsFromDatabase();
+        init();
+    }
     void init(){
         String apiKey = getString(R.string.my_api_key);
         if(!Places.isInitialized()){
@@ -89,7 +125,11 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                check();
+                try {
+                    check();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
@@ -104,47 +144,99 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return RADIUS_OF_EARTH * c;
     }
-    void check(){
-        Log.i("CHECK SIZe", "check: v size is" + v.size());
-        if(v.size()>0){
-            double dist1=1e9;
-            double dist2=1e9;
+    void check() throws IOException {
+        Log.i("CHECK SIZe", "check: v size is" + allpaths.size());
+        arrayList.clear();
+        if(allpaths.size()>0){
             double total_dist=haversine(src.getLatLng(),dst.getLatLng());
-            for(int i=0;i<v.size();i++){
-                Polyline p=v.get(i);
-                Log.i(TAG, "size: "+p.getPoints().size());
-                for(int j=0;j<p.getPoints().size();j++){
-                    double cur_dist1=haversine(src.getLatLng(),p.getPoints().get(j));
-                    double cur_dist2=haversine(dst.getLatLng(),p.getPoints().get(j));
+            for(int i=0;i<allpaths.size();i++){
+                double dist1=1e9;
+                double dist2=1e9;
+                for(int j=0;j<allpaths.get(i).size();j++){
+                    double cur_dist1=haversine(src.getLatLng(),allpaths.get(i).get(j));
+                    double cur_dist2=haversine(dst.getLatLng(),allpaths.get(i).get(j));
                     dist1=Math.min(dist1,cur_dist1);
                     dist2=Math.min(dist2,cur_dist2);
                 }
-            }
-            if(total_dist>dist1*10 && total_dist>dist2*10){
-                //show the driver in the list
-                //remove this polyLine after completion
-                Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
+                Log.i("TOTALDIST", "check: "+dist1+" "+dist2+" "+total_dist);
+                if(dist1+dist2<=total_dist && dist1<=5000 && dist2<=5000){
+                    //show the driver in the list
+                    //remove this polyLine after completion
+                    Geocoder geocoder=new Geocoder(this, Locale.getDefault());
+                    LatLng l=allpaths.get(i).get(0);
+                    LatLng l2=allpaths.get(i).get(allpaths.get(i).size()-1);
+                    String strAdd = "";
+                    String strDst="";
+                    List<Address> addresses = geocoder.getFromLocation(l.latitude, l.longitude, 1);
+                    List<Address> addresses1=geocoder.getFromLocation(l2.latitude,l2.longitude,1);
+                    if (addresses != null) {
+                        Address returnedAddress = addresses.get(0);
+                        StringBuilder strReturnedAddress = new StringBuilder("");
+
+                        for (int k = 0; k <= returnedAddress.getMaxAddressLineIndex(); k++) {
+                            strReturnedAddress.append(returnedAddress.getAddressLine(k)).append("\n");
+                        }
+                        strAdd = strReturnedAddress.toString();
+                    }
+                    if(addresses1!=null){
+                        Address returnedAddress = addresses1.get(0);
+                        StringBuilder strReturnedAddress = new StringBuilder("");
+                        for(int k=0;k<=returnedAddress.getMaxAddressLineIndex();k++){
+                            strReturnedAddress.append(returnedAddress.getAddressLine(k)).append("\n");
+                        }
+                        strDst=strReturnedAddress.toString();
+                    }
+                    Log.i("CHECKIFPOSS", "check: "+uid.get(i)+" "+dist1+" "+dist2+" "+total_dist+" ");
+                    arrayList.add("Email " + uid.get(i) +"\n" +"Start :" + strAdd +"\n"+ "Dest :" + strDst +"\n" );
+                    Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
+                }
             }
         }
-    }
+        Toast.makeText(this, "hi "+arrayList.size(), Toast.LENGTH_SHORT).show();
+        for (int k = 0; k < arrayList.size(); k++) {
+            TextView tv = new TextView(this);
+            tv.setText(arrayList.get(k));
+            tv.setTextSize(18);
+            tv.setPadding(340, 60, 60, 50);
+            tv.setId(k);
+            tv.setTextColor(Color.BLACK);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(15, 0, 15, 0);
+            tv.setLayoutParams(lp);
+            linearLayout.addView(tv);
+        }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_customer_home_page);
-        drawerLayout = findViewById(R.id.drawer_layout1);
-        navigationView = findViewById(R.id.nav_view1);
-        toolbar = findViewById(R.id.toolbar1);
-        setSupportActionBar(toolbar);
-        navigationView.bringToFront();
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(R.id.nav_home1);
-        init();
+        return ;
     }
-
+    void retrieveAllPathsFromDatabase() {
+        Vector<List<LatLng>> allPaths = new Vector<>();
+        fstore.collection("paths")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@androidx.annotation.NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String,Object>m=document.getData();
+                                for(Map.Entry<String,Object> entry : m.entrySet()){
+                                    uid.add(entry.getKey());
+                                    List<Map<String,Object>>m2=(List<Map<String, Object>>) entry.getValue();
+                                    List<LatLng>temp=new ArrayList<>();
+                                    for(int i=0;i<m2.size();i++){
+                                        double lat=(double)m2.get(i).get("latitude");
+                                        double lng=(double)m2.get(i).get("longitude");
+                                        temp.add(new LatLng(lat,lng));
+                                    }
+                                    allPaths.add(temp);
+                                }
+                                Log.i("CHECKANDTELL", "onComplete: "+document.getId() + " => " + allPaths.size());
+                            }
+                            Log.i("CHECKANDTELL", "retrieveAllPathsFromDatabase: "+allPaths.size());
+                            allpaths=allPaths;
+                        }
+                    }
+                });
+    }
     @Override
     public void onBackPressed() {
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
@@ -154,7 +246,6 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
             super.onBackPressed();
         }
     }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId()==R.id.nav_home1) {
@@ -175,3 +266,5 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         return true;
     }
 }
+
+
