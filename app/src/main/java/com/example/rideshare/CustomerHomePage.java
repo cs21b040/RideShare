@@ -31,6 +31,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -204,6 +205,46 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
             lp.setMargins(15, 0, 15, 0);
             tv.setLayoutParams(lp);
             linearLayout.addView(tv);
+        }
+
+        for(int k=0; k<arrayList.size(); k++){
+            DocumentReference documentReference= fstore.collection("users").document(uid.get(k));
+            TextView tv = findViewById(k);
+            int finalK = k;
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String temp= tv.getText().toString();
+                    int tempIn= 0;
+                    while(temp.charAt(tempIn)!='\n'){
+                        tempIn++;
+                    }
+                    tempIn+= 8;
+                    String start= "";
+                    for(int a= tempIn; temp.charAt(a)!='\n'; a++) {
+                        start+= temp.charAt(a);
+                        tempIn++;
+                    }
+                    temp+=7;
+                    String end= "";
+                    for(int a= tempIn; a<temp.length(); a++) end+= temp.charAt(a);
+
+                    documentReference.update("costumerMail", auth.getCurrentUser().getEmail());
+                    documentReference.update("from2", src.getAddress());
+                    documentReference.update("to2",dst.getAddress());
+                    documentReference.update("from1", start);
+                    documentReference.update("to1", end);
+
+                    DocumentReference dr= fstore.collection("users").document(auth.getCurrentUser().getUid());
+                    documentReference.update("costumerMail", uid.get(finalK));
+                    documentReference.update("from1", src.getAddress());
+                    documentReference.update("to1",dst.getAddress());
+                    documentReference.update("from2", start);
+                    documentReference.update("to2", end);
+
+                    Toast.makeText(CustomerHomePage.this, "The Ride is Successfully Booked.. Details in 'YOur Trip'", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         return ;

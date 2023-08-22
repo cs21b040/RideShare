@@ -76,6 +76,11 @@ public class SignUpFragment extends Fragment {
                                 user.put("vehicletype", "");
                                 user.put("vehiclenumber", "");
                                 user.put("dlno", "");
+                                user.put("costumerMail", "");
+                                user.put("from1", "");
+                                user.put("to1", "");
+                                user.put("from2", "");
+                                user.put("to2", "");
 
                                 documentReference.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
