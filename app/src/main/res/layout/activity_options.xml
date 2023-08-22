@@ -9,26 +9,55 @@
     <LinearLayout
         android:layout_width="409dp"
         android:layout_height="729dp"
-        android:gravity="center"
+
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5">
 
+        <TextView
+            android:id="@+id/hi_welcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|center_horizontal|top"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/edittext_bkg"
+            android:text="Start Your Ride, Your Way"
+            android:textColor="@color/quantum_bluegrey950"
+            android:textSize="27dp"
+            android:textStyle="italic|bold" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:paddingHorizontal="15dp"
+            android:orientation="horizontal">
         <Button
             android:id="@+id/newride"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:text="New Ride" />
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="left"
+            android:background="@color/lavender"
+            android:text="Start a New Ride"
+            android:textColor="@color/quantum_bluegrey950"
+            android:textStyle="italic|bold" />
 
-        <Button
-            android:id="@+id/shareride"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:text="Share Ride" />
+            <Button
+                android:id="@+id/shareride"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_gravity="right"
+                android:background="@color/lavender"
+                android:layout_marginHorizontal="15dp"
+                android:text="Join to Share Ride"
+                android:textColor="@color/quantum_bluegrey950"
+                android:textStyle="italic|bold" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
