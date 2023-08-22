@@ -8,20 +8,18 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -31,18 +29,15 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
@@ -50,6 +45,8 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     Toolbar toolbar;
+    private GoogleMap map;
+    SupportMapFragment mapFragment;
 
     Button button;
     private final double RADIUS_OF_EARTH=6378.1e3;
@@ -57,8 +54,6 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
     private FirebaseAuth auth;
     private FirebaseFirestore fstore;
     Vector<List<LatLng>> allpaths;
-    private LinearLayout linearLayout;
-    private ArrayList<String> arrayList,uid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,19 +64,16 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         fstore = FirebaseFirestore.getInstance();
         toolbar = findViewById(R.id.toolbar1);
         setSupportActionBar(toolbar);
-        linearLayout=findViewById(R.id.linear_layout);
         navigationView.bringToFront();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_home1);
-        allpaths=new Vector<>();
-        uid=new ArrayList<>();
-        arrayList=new ArrayList<>();
         retrieveAllPathsFromDatabase();
         init();
     }
+
     void init(){
         String apiKey = getString(R.string.my_api_key);
         if(!Places.isInitialized()){
@@ -126,11 +118,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    check();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                check();
             }
         });
     }
@@ -145,109 +133,27 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return RADIUS_OF_EARTH * c;
     }
-    void check() throws IOException {
+    void check(){
         Log.i("CHECK SIZe", "check: v size is" + allpaths.size());
-        arrayList.clear();
         if(allpaths.size()>0){
+            double dist1=1e9;
+            double dist2=1e9;
             double total_dist=haversine(src.getLatLng(),dst.getLatLng());
             for(int i=0;i<allpaths.size();i++){
-                double dist1=1e9;
-                double dist2=1e9;
                 for(int j=0;j<allpaths.get(i).size();j++){
                     double cur_dist1=haversine(src.getLatLng(),allpaths.get(i).get(j));
                     double cur_dist2=haversine(dst.getLatLng(),allpaths.get(i).get(j));
                     dist1=Math.min(dist1,cur_dist1);
                     dist2=Math.min(dist2,cur_dist2);
                 }
-                Log.i("TOTALDIST", "check: "+dist1+" "+dist2+" "+total_dist);
-                if(dist1+dist2<=total_dist && dist1<=5000 && dist2<=5000){
-                    //show the driver in the list
-                    //remove this polyLine after completion
-                    Geocoder geocoder=new Geocoder(this, Locale.getDefault());
-                    LatLng l=allpaths.get(i).get(0);
-                    LatLng l2=allpaths.get(i).get(allpaths.get(i).size()-1);
-                    String strAdd = "";
-                    String strDst="";
-                    List<Address> addresses = geocoder.getFromLocation(l.latitude, l.longitude, 1);
-                    List<Address> addresses1=geocoder.getFromLocation(l2.latitude,l2.longitude,1);
-                    if (addresses != null) {
-                        Address returnedAddress = addresses.get(0);
-                        StringBuilder strReturnedAddress = new StringBuilder("");
-
-                        for (int k = 0; k <= returnedAddress.getMaxAddressLineIndex(); k++) {
-                            strReturnedAddress.append(returnedAddress.getAddressLine(k)).append("\n");
-                        }
-                        strAdd = strReturnedAddress.toString();
-                    }
-                    if(addresses1!=null){
-                        Address returnedAddress = addresses1.get(0);
-                        StringBuilder strReturnedAddress = new StringBuilder("");
-                        for(int k=0;k<=returnedAddress.getMaxAddressLineIndex();k++){
-                            strReturnedAddress.append(returnedAddress.getAddressLine(k)).append("\n");
-                        }
-                        strDst=strReturnedAddress.toString();
-                    }
-                    Log.i("CHECKIFPOSS", "check: "+uid.get(i)+" "+dist1+" "+dist2+" "+total_dist+" ");
-                    arrayList.add("Email " + uid.get(i) +"\n" +"Start :" + strAdd +"\n"+ "Dest :" + strDst +"\n" );
-                    Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
-                }
+            }
+            Log.i("TOTALDIST", "check: "+dist1+" "+dist2+" "+total_dist);
+            if(dist1+dist2<=total_dist){
+                //show the driver in the list
+                //remove this polyLine after completion
+                Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
             }
         }
-        Toast.makeText(this, "hi "+arrayList.size(), Toast.LENGTH_SHORT).show();
-        for (int k = 0; k < arrayList.size(); k++) {
-            TextView tv = new TextView(this);
-            tv.setText(arrayList.get(k));
-            tv.setTextSize(18);
-            tv.setPadding(340, 60, 60, 50);
-            tv.setId(k);
-            tv.setTextColor(Color.BLACK);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(15, 0, 15, 0);
-            tv.setLayoutParams(lp);
-            linearLayout.addView(tv);
-        }
-
-        for(int k=0; k<arrayList.size(); k++){
-            DocumentReference documentReference= fstore.collection("users").document(uid.get(k));
-            TextView tv = findViewById(k);
-            int finalK = k;
-            tv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String temp= tv.getText().toString();
-                    int tempIn= 0;
-                    while(temp.charAt(tempIn)!='\n'){
-                        tempIn++;
-                    }
-                    tempIn+= 8;
-                    String start= "";
-                    for(int a= tempIn; temp.charAt(a)!='\n'; a++) {
-                        start+= temp.charAt(a);
-                        tempIn++;
-                    }
-                    temp+=7;
-                    String end= "";
-                    for(int a= tempIn; a<temp.length(); a++) end+= temp.charAt(a);
-
-                    documentReference.update("costumerMail", auth.getCurrentUser().getEmail());
-                    documentReference.update("from2", src.getAddress());
-                    documentReference.update("to2",dst.getAddress());
-                    documentReference.update("from1", start);
-                    documentReference.update("to1", end);
-
-                    DocumentReference dr= fstore.collection("users").document(auth.getCurrentUser().getUid());
-                    documentReference.update("costumerMail", uid.get(finalK));
-                    documentReference.update("from1", src.getAddress());
-                    documentReference.update("to1",dst.getAddress());
-                    documentReference.update("from2", start);
-                    documentReference.update("to2", end);
-
-                    Toast.makeText(CustomerHomePage.this, "The Ride is Successfully Booked.. Details in 'YOur Trip'", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        return ;
     }
     void retrieveAllPathsFromDatabase() {
         Vector<List<LatLng>> allPaths = new Vector<>();
@@ -260,7 +166,6 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Map<String,Object>m=document.getData();
                                 for(Map.Entry<String,Object> entry : m.entrySet()){
-                                    uid.add(entry.getKey());
                                     List<Map<String,Object>>m2=(List<Map<String, Object>>) entry.getValue();
                                     List<LatLng>temp=new ArrayList<>();
                                     for(int i=0;i<m2.size();i++){
@@ -275,6 +180,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                             Log.i("CHECKANDTELL", "retrieveAllPathsFromDatabase: "+allPaths.size());
                             allpaths=allPaths;
                         }
+
                     }
                 });
     }

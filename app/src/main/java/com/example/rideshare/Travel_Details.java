@@ -2,18 +2,13 @@ package com.example.rideshare;
 
 import static com.example.rideshare.OptionsActivity.isDriver;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.ktx.Firebase;
 
 public class Travel_Details extends AppCompatActivity {
@@ -35,32 +30,15 @@ public class Travel_Details extends AppCompatActivity {
         to2= findViewById(R.id.to2);
         phone2= findViewById(R.id.phone2);
         String userId= auth.getCurrentUser().getUid();
-        DocumentReference documentReference= fstore.collection("users").document(userId);
 
-        documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@NonNull DocumentSnapshot snapshot, @NonNull FirebaseFirestoreException error) {
-                if (snapshot.exists()) {
-                    if (isDriver) {
-                        traveler.setText("Travelling as : Driver");
-                        from1.setText(snapshot.getString("from1"));
-                        to1.setText(snapshot.getString("to1"));
-                        phone1.setText(snapshot.getString("userId"));
-                        phone2.setText(snapshot.getString("costumerMail"));
-                        from2.setText(snapshot.getString("from2"));
-                        to2.setText(snapshot.getString("to2"));
-                    }
-                    else {
-                        traveler.setText("Travelling as : Passenger");
-                        from1.setText(snapshot.getString("from2"));
-                        to1.setText(snapshot.getString("to2"));
-                        phone2.setText(snapshot.getString("userId"));
-                        phone1.setText(snapshot.getString("costumerMail"));
-                        from2.setText(snapshot.getString("from1"));
-                        to2.setText(snapshot.getString("to1"));
-                    }
-                }
-            }
-        });
+        if(isDriver) {
+            traveler.setText("Travelling as : Driver");
+
+
+        }
+        else {
+            traveler.setText("Travelling as : Passenger");
+        }
+
     }
 }
