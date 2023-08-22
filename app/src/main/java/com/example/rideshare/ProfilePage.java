@@ -22,8 +22,6 @@ public class ProfilePage extends AppCompatActivity {
     private Button button;
     private FirebaseAuth auth;
     private FirebaseFirestore fstore;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
