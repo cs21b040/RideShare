@@ -14,6 +14,10 @@
             android:title="@string/profile"
             android:icon="@drawable/profile_icon" />
         <item
+            android:id="@+id/nav_trip1"
+            android:title="YourTrips"
+            android:icon="@drawable/baseline_directions_car_24" />
+        <item
             android:id="@+id/nav_logout1"
             android:title="@string/logout"
             android:icon="@drawable/logout_icon" />

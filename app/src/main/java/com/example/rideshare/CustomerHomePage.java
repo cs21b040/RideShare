@@ -304,6 +304,12 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
             startActivity(intent1);
             finish();
         }
+        else if(item.getItemId()==R.id.nav_trip1)
+        {
+            Intent intent1=new Intent(CustomerHomePage.this, Travel_Details.class);
+            startActivity(intent1);
+            finish();
+        }
         return true;
     }
 }
