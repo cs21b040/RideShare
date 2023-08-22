@@ -207,7 +207,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
 
     }
     void addToDatabase(Polyline polyline) {
-        String userId = auth.getCurrentUser().getUid();
+        String userId = auth.getCurrentUser().getEmail();
         List<LatLng> points = polyline.getPoints();
         HashMap<String, Object> path = new HashMap<>();
         path.put(userId, points);
