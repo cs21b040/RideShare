@@ -214,6 +214,7 @@
                 android:gravity="center"
                 android:text="Save"
                 android:background="@color/lavender"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 app:cornerRadius="30dp" />
 
