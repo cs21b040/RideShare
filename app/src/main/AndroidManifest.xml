@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Rideshare"
         tools:targetApi="31">
         <activity
+            android:name=".Travel_Details"
+            android:exported="false" />
+        <activity
             android:name=".CustomerHomePage"
             android:exported="false" />
         <activity
