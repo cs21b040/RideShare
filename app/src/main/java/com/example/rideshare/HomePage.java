@@ -207,7 +207,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
 
     }
     void addToDatabase(Polyline polyline) {
-        String userId = auth.getCurrentUser().getUid();
+        String userId = auth.getCurrentUser().getEmail();
         List<LatLng> points = polyline.getPoints();
         HashMap<String, Object> path = new HashMap<>();
         path.put(userId, points);
@@ -270,11 +270,6 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             Intent intent1=new Intent(HomePage.this, Login.class);
             startActivity(intent1);
             finish();
-        }
-        else if(item.getItemId()==R.id.nav_trip)
-        {
-            Intent intent2=new Intent(HomePage.this, Travel_Details.class);
-            startActivity(intent2);
         }
         return true;
     }
