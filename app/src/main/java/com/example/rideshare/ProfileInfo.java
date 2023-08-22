@@ -52,7 +52,6 @@ public class ProfileInfo extends AppCompatActivity {
                 documentReference.update("dlno",userdln);
 
                 startActivity(new Intent(ProfileInfo.this,HomePage.class));
-                finish();
             }
         });
     }

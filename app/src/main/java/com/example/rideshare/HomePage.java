@@ -271,6 +271,11 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             startActivity(intent1);
             finish();
         }
+        else if(item.getItemId()==R.id.nav_trip)
+        {
+            Intent intent2=new Intent(HomePage.this, Travel_Details.class);
+            startActivity(intent2);
+        }
         return true;
     }
 
