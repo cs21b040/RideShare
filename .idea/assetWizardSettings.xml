@@ -307,7 +307,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$USER_HOME$/Android/Sdk/icons/material/materialicons/calendar_month/baseline_calendar_month_24.xml" />
+                                      <entry key="url" value="file:$USER_HOME$/Android/Sdk/icons/material/materialicons/directions_car_filled/baseline_directions_car_filled_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -318,7 +318,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="8692f7" />
-                            <entry key="outputName" value="baseline_calendar_month_24" />
+                            <entry key="outputName" value="nav_car" />
                           </map>
                         </option>
                       </PersistentState>

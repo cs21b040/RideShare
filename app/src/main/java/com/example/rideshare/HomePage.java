@@ -257,8 +257,9 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId()==R.id.nav_home) {
-            Intent intent=new Intent (HomePage.this, HomePage.class);
+            Intent intent=new Intent (HomePage.this, OptionsActivity.class);
             startActivity(intent);
+            finish();
         }
         else if(item.getItemId()==R.id.nav_profile) {
             Intent intent=new Intent (HomePage.this, ProfilePage.class);
@@ -269,6 +270,12 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             Toast.makeText(this, "Log Out SuccessFull", Toast.LENGTH_SHORT).show();
             Intent intent1=new Intent(HomePage.this, Login.class);
             startActivity(intent1);
+            finish();
+        }
+        else if(item.getItemId()==R.id.nav_trip)
+        {
+            Intent intent2=new Intent(HomePage.this, Travel_Details.class);
+            startActivity(intent2);
             finish();
         }
         return true;
