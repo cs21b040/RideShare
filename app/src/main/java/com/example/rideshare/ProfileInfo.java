@@ -51,7 +51,7 @@ public class ProfileInfo extends AppCompatActivity {
                 documentReference.update("vehiclenumber",usernumber);
                 documentReference.update("dlno",userdln);
 
-                startActivity(new Intent(ProfileInfo.this,HomePage.class));
+                startActivity(new Intent(ProfileInfo.this,OptionsActivity.class));
                 finish();
             }
         });

@@ -66,7 +66,6 @@ public class SignUpFragment extends Fragment {
                                 HashMap<String, Object> user = new HashMap<>();
                                 String userId = auth.getCurrentUser().getUid();
                                 DocumentReference documentReference = fstore.collection("users").document(userId);
-
                                 user.put("name", username);
                                 user.put("email", useremail);
                                 user.put("password", userpassword);
@@ -81,6 +80,8 @@ public class SignUpFragment extends Fragment {
                                 user.put("to1", "");
                                 user.put("from2", "");
                                 user.put("to2", "");
+                                user.put("isdriver", "false");
+                                user.put("isrider", "false");
 
                                 documentReference.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

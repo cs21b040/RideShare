@@ -31,6 +31,7 @@ public class LoginFragment extends Fragment {
     private Button signin;
     private FirebaseAuth auth;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

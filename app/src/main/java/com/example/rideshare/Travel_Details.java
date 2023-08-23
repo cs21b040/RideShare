@@ -1,7 +1,5 @@
 package com.example.rideshare;
 
-import static com.example.rideshare.OptionsActivity.isDriver;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -40,25 +38,19 @@ public class Travel_Details extends AppCompatActivity {
         documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@NonNull DocumentSnapshot snapshot, @NonNull FirebaseFirestoreException error) {
-                if (snapshot.exists()) {
-                    if (isDriver) {
+                if (snapshot != null && snapshot.exists()) {
+                    String temp1 = snapshot.getString("isdriver");
+                    if (temp1 != null && temp1.equals("true")) {
                         traveler.setText("Travelling as : Driver");
-                        from1.setText(snapshot.getString("from1"));
-                        to1.setText(snapshot.getString("to1"));
-                        phone1.setText(snapshot.getString("userId"));
-                        phone2.setText(snapshot.getString("costumerMail"));
-                        from2.setText(snapshot.getString("from2"));
-                        to2.setText(snapshot.getString("to2"));
-                    }
-                    else {
+                    } else {
                         traveler.setText("Travelling as : Passenger");
-                        from1.setText(snapshot.getString("from2"));
-                        to1.setText(snapshot.getString("to2"));
-                        phone2.setText(snapshot.getString("userId"));
-                        phone1.setText(snapshot.getString("costumerMail"));
-                        from2.setText(snapshot.getString("from1"));
-                        to2.setText(snapshot.getString("to1"));
                     }
+                    from1.setText(snapshot.getString("from1"));
+                    to1.setText(snapshot.getString("to1"));
+                    phone1.setText(snapshot.getString("email"));
+                    phone2.setText(snapshot.getString("costumerMail"));
+                    from2.setText(snapshot.getString("from2"));
+                    to2.setText(snapshot.getString("to2"));
                 }
             }
         });

@@ -10,6 +10,7 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         super(fragmentManager, lifecycle);
     }
 
+
     @NonNull
     @Override
     public Fragment createFragment(int position) {
