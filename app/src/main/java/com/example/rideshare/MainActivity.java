@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     TextView wel,learning;
     private static int Splash_timeout=2000;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

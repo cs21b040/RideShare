@@ -52,10 +52,10 @@
                 android:layout_height="70dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
+                android:background="@color/lavender"
                 android:gravity="center"
                 android:text="LogIn"
-                android:background="@color/lavender"
-                android:textColor="@color/white"
+                android:textColor="#263238"
                 android:textSize="18sp"
                 app:cornerRadius="30dp" />
 

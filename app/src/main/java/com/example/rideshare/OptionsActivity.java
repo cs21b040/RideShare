@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,14 +21,14 @@ public class OptionsActivity extends AppCompatActivity {
     private Button shareride;
     private FirebaseAuth auth;
     private FirebaseFirestore fstore;
-    static boolean isDriver= true;
-
+    private Button logout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
         newride=findViewById(R.id.newride);
         shareride=findViewById(R.id.shareride);
+        logout= findViewById(R.id.opt_logout);
         auth= FirebaseAuth.getInstance();
         fstore= FirebaseFirestore.getInstance();
         String userId= auth.getCurrentUser().getUid();
@@ -42,9 +43,13 @@ public class OptionsActivity extends AppCompatActivity {
                             String dln= documentSnapshot.getString("dlno");
                             String vehiclenumber= documentSnapshot.getString("vehiclenumber");
                             if(!Objects.equals(dln, "") && !Objects.equals(vehiclenumber, "")){
+                                documentSnapshot.getReference().update("isdriver","true");
+                                documentSnapshot.getReference().update("isrider","false");
                                 startActivity(new Intent(OptionsActivity.this, HomePage.class));
                             }
                             else{
+                                documentSnapshot.getReference().update("isdriver","false");
+                                documentSnapshot.getReference().update("isrider","true");
                                 startActivity(new Intent(OptionsActivity.this,ProfileInfo.class));
                                 finish();
                             }
@@ -57,9 +62,19 @@ public class OptionsActivity extends AppCompatActivity {
         shareride.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isDriver= false;
                 startActivity(new Intent(OptionsActivity.this,CustomerHomePage.class));
             }
         });
+
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                auth.signOut();
+                Toast.makeText(OptionsActivity.this, "Logout Successful", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(OptionsActivity.this,Login.class));
+                finish();
+            }
+        });
+
     }
 }

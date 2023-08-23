@@ -44,9 +44,9 @@
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp"
+        android:text="Your's Details"
         android:textColor="@color/lavender"
-        android:textStyle="bold"
-        android:text="Driver's Details" />
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/from1"
@@ -74,8 +74,8 @@
         android:layout_height="35dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
-        android:padding="8dp"
-        android:hint="Mobile Number: " />
+        android:hint="Email: "
+        android:padding="8dp" />
 
     <TextView
         android:id="@+id/textView18"
@@ -113,7 +113,7 @@
         android:layout_height="35dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
-        android:padding="8dp"
-        android:hint="Mobile Number: " />
+        android:hint="Email: "
+        android:padding="8dp" />
 
 </LinearLayout>

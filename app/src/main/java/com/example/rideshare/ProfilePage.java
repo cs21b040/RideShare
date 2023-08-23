@@ -41,6 +41,7 @@ public class ProfilePage extends AppCompatActivity {
         button=findViewById(R.id.button);
         String userId= auth.getCurrentUser().getUid();
 
+
         DocumentReference documentReference= fstore.collection("users").document(userId);
         documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override

@@ -210,8 +210,11 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         String userId = auth.getCurrentUser().getEmail();
         List<LatLng> points = polyline.getPoints();
         HashMap<String, Object> path = new HashMap<>();
-        path.put(userId, points);
-        fstore.collection("paths").document().set(path)
+        User user=new User();
+        user.route=points;
+        user.uid=auth.getCurrentUser().getUid();
+        path.put(userId, user);
+        fstore.collection("paths").document(user.uid).set(path)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -266,17 +269,17 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             startActivity(intent);
         }
         else if(item.getItemId()==R.id.nav_logout) {
-            FirebaseAuth.getInstance().signOut();
+            auth.signOut();
             Toast.makeText(this, "Log Out SuccessFull", Toast.LENGTH_SHORT).show();
             Intent intent1=new Intent(HomePage.this, Login.class);
             startActivity(intent1);
             finish();
+
         }
         else if(item.getItemId()==R.id.nav_trip)
         {
             Intent intent2=new Intent(HomePage.this, Travel_Details.class);
             startActivity(intent2);
-            finish();
         }
         return true;
     }
@@ -309,8 +312,6 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage() );
         }
     }
-
-
     private void moveCamera(LatLng latLng, float zoom,String title){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));

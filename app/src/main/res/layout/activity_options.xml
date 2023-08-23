@@ -53,5 +53,16 @@
 
             android:layout_gravity="center"
             android:text="Share Ride" />
+
+        <Button
+            android:id="@+id/opt_logout"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="260dp"
+            android:layout_gravity="right"
+            android:background="@drawable/edittext_bkg"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/lavender"
+            android:text="Logout" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
