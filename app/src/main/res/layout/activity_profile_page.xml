@@ -16,7 +16,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/profile"
@@ -67,16 +67,16 @@
                 android:textSize="18sp" />
 
             <EditText
+                android:id="@+id/dob"
                 android:layout_width="350dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:id="@+id/dob"
                 android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:hint="Date Of Birth"
+                android:background="@drawable/edittext_bkg"
                 android:drawableLeft="@drawable/baseline_calendar_month_24"
                 android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"/>
+                android:hint="Date Of Birth"
+                android:padding="8dp" />
 
             <TextView
                 android:id="@+id/textView5"
@@ -90,16 +90,16 @@
                 android:textSize="18sp" />
 
             <EditText
+                android:id="@+id/email"
                 android:layout_width="350dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:id="@+id/email"
                 android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:hint="Email"
+                android:background="@drawable/edittext_bkg"
                 android:drawableLeft="@drawable/baseline_email_24"
                 android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"/>
+                android:hint="Email"
+                android:padding="8dp" />
 
             <TextView
                 android:id="@+id/textView6"
@@ -111,17 +111,18 @@
                 android:text="Phone Number:"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
+
             <EditText
+                android:id="@+id/pno"
                 android:layout_width="350dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:id="@+id/pno"
                 android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:hint="Phone Number"
+                android:background="@drawable/edittext_bkg"
                 android:drawableLeft="@drawable/baseline_phone_24"
                 android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"/>
+                android:hint="Phone Number"
+                android:padding="8dp" />
 
             <TextView
                 android:id="@+id/textView7"
@@ -133,16 +134,17 @@
                 android:text="Aadhaar Number:"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
+
             <EditText
+                android:id="@+id/aadhaar"
                 android:layout_width="350dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:id="@+id/aadhaar"
                 android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:hint="Aadhaar Number"
+                android:background="@drawable/edittext_bkg"
                 android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"/>
+                android:hint="Aadhaar Number"
+                android:padding="8dp" />
 
             <TextView
                 android:id="@+id/textView8"
@@ -154,16 +156,17 @@
                 android:text="Vehicle Type:"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
+
             <EditText
+                android:id="@+id/vehicletype"
                 android:layout_width="350dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:id="@+id/vehicletype"
                 android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:hint="Enter Vehicle Type"
+                android:background="@drawable/edittext_bkg"
                 android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"/>
+                android:hint="Enter Vehicle Type"
+                android:padding="8dp" />
 
             <TextView
                 android:id="@+id/textView9"
@@ -175,16 +178,17 @@
                 android:text="Vehicle Number:"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
+
             <EditText
+                android:id="@+id/vehiclenumber"
                 android:layout_width="350dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:id="@+id/vehiclenumber"
                 android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:hint="Vehicle Number"
+                android:background="@drawable/edittext_bkg"
                 android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"/>
+                android:hint="Vehicle Number"
+                android:padding="8dp" />
 
             <TextView
                 android:id="@+id/textView10"
@@ -196,25 +200,28 @@
                 android:text="Driving License Number:"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
+
             <EditText
+                android:id="@+id/dln"
                 android:layout_width="350dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:id="@+id/dln"
                 android:layout_marginTop="10dp"
-                android:padding="8dp"
-                android:hint="Driving License Number"
+                android:background="@drawable/edittext_bkg"
                 android:drawablePadding="8dp"
-                android:background="@drawable/edittext_bkg"/>
+                android:hint="Driving License Number"
+                android:padding="8dp" />
+
             <Button
                 android:id="@+id/button"
-                android:layout_width="300dp"
-                android:layout_height="70dp"
+                android:layout_width="175dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/lavender"
                 android:gravity="center"
                 android:text="Save"
-                android:background="@color/lavender"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 app:cornerRadius="30dp" />
