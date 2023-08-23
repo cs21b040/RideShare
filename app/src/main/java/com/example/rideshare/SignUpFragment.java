@@ -87,7 +87,6 @@ public class SignUpFragment extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Toast.makeText(getActivity(), "Data Stored", Toast.LENGTH_SHORT).show();
                                             startActivity(new Intent(getActivity(), OptionsActivity.class));
                                             getActivity().finish();
                                         } else {

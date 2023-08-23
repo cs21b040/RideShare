@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,6 +20,7 @@ public class Travel_Details extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore fstore;
     private TextView traveler, from1, to1, phone1, from2, to2, phone2;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class Travel_Details extends AppCompatActivity {
         from2= findViewById(R.id.from2);
         to2= findViewById(R.id.to2);
         phone2= findViewById(R.id.phone2);
+        button= findViewById(R.id.endride);
         String userId= auth.getCurrentUser().getUid();
         DocumentReference documentReference= fstore.collection("users").document(userId);
 
@@ -52,6 +56,32 @@ public class Travel_Details extends AppCompatActivity {
                     from2.setText(snapshot.getString("from2"));
                     to2.setText(snapshot.getString("to2"));
                 }
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@NonNull DocumentSnapshot snapshot, @NonNull FirebaseFirestoreException error) {
+                        if (snapshot != null && snapshot.exists()) {
+                            documentReference.update("isdriver", "false");
+                            documentReference.update("from1", "");
+                            documentReference.update("to1", "");
+                            documentReference.update("costumerMail", "");
+                            documentReference.update("from2", "");
+                            documentReference.update("to2", "");
+                            from1.setText("");
+                            to1.setText("");
+                            phone1.setText("");
+                            phone2.setText("");
+                            from2.setText("");
+                            to2.setText("");
+                            traveler.setText("");
+                        }
+                    }
+                });
             }
         });
     }

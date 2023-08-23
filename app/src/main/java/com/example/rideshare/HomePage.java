@@ -218,7 +218,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(HomePage.this, "Path added to database", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomePage.this, "Your ride is successfully shared", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -242,7 +242,6 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         if(list.size()>0){
             Address address=list.get(0);
             Log.d(TAG, "geoLocate: found a location: "+address.toString());
-            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
             moveCamera(new LatLng(address.getLatitude(),address.getLongitude()),15f, address.getAddressLine(0));
         }
     }
@@ -303,7 +302,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
 
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
-                            Toast.makeText(HomePage.this, "unable to get current location", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(HomePage.this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -319,7 +318,6 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         map.addMarker(options);
     }
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onMapReady: map is ready");
         map = googleMap;
 

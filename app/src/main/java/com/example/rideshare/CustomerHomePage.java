@@ -158,6 +158,9 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
     void check() throws IOException {
         Log.i("CHECK SIZe", "check: v size is" + allpaths.size());
         arrayList.clear();
+        if(allpaths.size()==0){
+            Toast.makeText(this, "No Routes Available", Toast.LENGTH_SHORT).show();
+        }
         if(allpaths.size()>0){
             double total_dist=haversine(src.getLatLng(),dst.getLatLng());
             for(int i=0;i<allpaths.size();i++){
@@ -218,12 +221,11 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                     Log.i("CHECKIFPOSS", "check: "+uid.get(i)+" "+dist1+" "+dist2+" "+total_dist+" ");
                     arrayList.add("Email " + uid.get(i) +"\n" +"Start :" + strAdd +"\n"+ "Dest :" + strDst +"\n" );
                     userUid.add(allpaths.get(i).uid);
-                    Toast.makeText(this, "We have a route", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "We have " + allpaths.size() + " route/s", Toast.LENGTH_SHORT).show();
                 }
             }
         }
         linearLayout.removeAllViews();
-        Toast.makeText(this, "hi "+arrayList.size(), Toast.LENGTH_SHORT).show();
         for (int k = 0; k < arrayList.size(); k++) {
             TextView tv = new TextView(this);
             tv.setText(arrayList.get(k));
@@ -259,8 +261,8 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                     dr.update("from2", strAdd);
                     dr.update("to2", strDst);
                     Toast.makeText(CustomerHomePage.this, "The Ride is Successfully Booked.. Details in 'Your Trip'", Toast.LENGTH_SHORT).show();
-
                     deleteFromDatabase(userId);
+                    startActivity(new Intent(CustomerHomePage.this, Travel_Details.class));
                 }
             });
         }
@@ -285,7 +287,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                                     uid.add(entry.getKey());
                                     Map<String,Object> m2=(Map<String, Object>) entry.getValue();
                                     String s=(String)m2.get("uid");
-                                    Toast.makeText(CustomerHomePage.this, s, Toast.LENGTH_SHORT).show();
+
                                     List<LatLng>temp=new ArrayList<>();
                                     List<Object> path= (List<Object>) m2.get("route");
                                     for(int i=0;i<path.size();i++){

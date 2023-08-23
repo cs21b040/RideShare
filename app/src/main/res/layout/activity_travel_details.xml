@@ -60,8 +60,9 @@
         />
     <TextView
         android:id="@+id/from1"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp"
@@ -80,8 +81,9 @@
 
     <TextView
         android:id="@+id/to1"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp" />
@@ -99,8 +101,9 @@
 
     <TextView
         android:id="@+id/phone1"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp" />
@@ -113,7 +116,7 @@
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp"
-        android:text="Costumer's Details"
+        android:text="Companion's Details"
         android:textColor="@color/lavender"
         android:textStyle="bold" />
 
@@ -130,8 +133,9 @@
         />
     <TextView
         android:id="@+id/from2"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp"
@@ -150,8 +154,9 @@
 
     <TextView
         android:id="@+id/to2"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp" />
@@ -169,10 +174,22 @@
 
     <TextView
         android:id="@+id/phone2"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="35dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/edittext_bkg"
         android:drawablePadding="8dp"
         android:padding="8dp" />
+
+    <Button
+        android:id="@+id/endride"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:background="@drawable/edittext_bkg"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/lavender"
+        android:text="End Ride" />
 
 </LinearLayout>
