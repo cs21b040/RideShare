@@ -36,6 +36,7 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login_tab, container, false);
+        //initialize the below variables
         signin = view.findViewById(R.id.signin);
         username = view.findViewById(R.id.email);
         password = view.findViewById(R.id.password);
@@ -46,6 +47,7 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 String useremail = username.getText().toString();
                 String userpassword = password.getText().toString();
+                //Ensuring every email  and Password is non-Empty
                 if (useremail.isEmpty()) {
                     username.setError("Please Enter Email");
                     username.requestFocus();
@@ -56,15 +58,17 @@ public class LoginFragment extends Fragment {
                     password.requestFocus();
                     return;
                 }
-
+                //Signing in the user with the help of Firebase Authentication
                 auth.signInWithEmailAndPassword(useremail, userpassword).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
+                        //if the user is successfully logged in he is redirected to OptionsActivity
                         startActivity(new Intent(requireContext(), OptionsActivity.class));
                         requireActivity().finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
+                    //if the user is not successfully logged in he is shown a Toast Of respective Possible error
                     public void onFailure(@NonNull Exception e) {
                         if (e instanceof FirebaseAuthInvalidUserException) {
                             Toast.makeText(requireContext(), "Account not found. Please sign up.", Toast.LENGTH_SHORT).show();

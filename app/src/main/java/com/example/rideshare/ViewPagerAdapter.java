@@ -10,7 +10,7 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         super(fragmentManager, lifecycle);
     }
 
-
+    //Adapter For Login & SignUp Fragment
     @NonNull
     @Override
     public Fragment createFragment(int position) {

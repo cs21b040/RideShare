@@ -26,6 +26,7 @@ public class Travel_Details extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_details);
+        //intiiating the variables
         auth= FirebaseAuth.getInstance();
         fstore= FirebaseFirestore.getInstance();
         traveler= findViewById(R.id.traveler);
@@ -38,10 +39,10 @@ public class Travel_Details extends AppCompatActivity {
         button= findViewById(R.id.endride);
         String userId= auth.getCurrentUser().getUid();
         DocumentReference documentReference= fstore.collection("users").document(userId);
-
         documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@NonNull DocumentSnapshot snapshot, @NonNull FirebaseFirestoreException error) {
+                //updating these fields in Firebase Firestore
                 if (snapshot != null && snapshot.exists()) {
                     String temp1 = snapshot.getString("isdriver");
                     if (temp1 != null && temp1.equals("true")) {
@@ -62,6 +63,7 @@ public class Travel_Details extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Removing the data from Firebase Firestore
                 documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@NonNull DocumentSnapshot snapshot, @NonNull FirebaseFirestoreException error) {

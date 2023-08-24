@@ -26,11 +26,13 @@ public class OptionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
+        //initializing the variables
         newride=findViewById(R.id.newride);
         shareride=findViewById(R.id.shareride);
         logout= findViewById(R.id.opt_logout);
         auth= FirebaseAuth.getInstance();
         fstore= FirebaseFirestore.getInstance();
+        //storing the currentUser UID in userId which will be helpful as we need to update data in his document in firestore
         String userId= auth.getCurrentUser().getUid();
         DocumentReference documentReference= fstore.collection("users").document(userId);
         newride.setOnClickListener(new View.OnClickListener() {
@@ -40,14 +42,19 @@ public class OptionsActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if(documentSnapshot.exists()){
+                            //updating the fields in Firebase Firestore
                             String dln= documentSnapshot.getString("dlno");
                             String vehiclenumber= documentSnapshot.getString("vehiclenumber");
                             if(!Objects.equals(dln, "") && !Objects.equals(vehiclenumber, "")){
+                                //checking if user is using the app for the first time or not
                                 documentSnapshot.getReference().update("isdriver","true");
                                 documentSnapshot.getReference().update("isrider","false");
+                                //Now the user is redirected to HomePage where he can post his ride
                                 startActivity(new Intent(OptionsActivity.this, HomePage.class));
                             }
                             else{
+                                //if user is using the app for the first time he is redirected
+                                // to ProfileInfo Activity to update his details
                                 documentSnapshot.getReference().update("isdriver","false");
                                 documentSnapshot.getReference().update("isrider","true");
                                 startActivity(new Intent(OptionsActivity.this,ProfileInfo.class));
@@ -62,6 +69,7 @@ public class OptionsActivity extends AppCompatActivity {
         shareride.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //If user wants to share ride with other user he is redirected to CustomerHomePage
                 startActivity(new Intent(OptionsActivity.this,CustomerHomePage.class));
             }
         });
@@ -69,6 +77,7 @@ public class OptionsActivity extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //when user clicks on logout button he is logged out and redirected to Login Activity
                 auth.signOut();
                 Toast.makeText(OptionsActivity.this, "Logout Successful", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(OptionsActivity.this,Login.class));

@@ -28,6 +28,7 @@ public class ProfilePage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_page);
+        //initializing the variables
         auth= FirebaseAuth.getInstance();
         fstore= FirebaseFirestore.getInstance();
         name=findViewById(R.id.name);
@@ -46,7 +47,7 @@ public class ProfilePage extends AppCompatActivity {
         documentReference.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
-
+                //when the user clicks on the profile button the editText Fields gets data from FireBase FireStore
                 name.setText(documentSnapshot.getString("name"));
                 email.setText(documentSnapshot.getString("email"));
                 pno.setText(documentSnapshot.getString("pno"));
@@ -61,6 +62,7 @@ public class ProfilePage extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //when the user clicks on the update button the data available in every editText field is updated in the FireBase FireStore
                 documentReference.update("name",name.getText().toString());
                 documentReference.update("email",email.getText().toString());
                 documentReference.update("pno",pno.getText().toString());
@@ -69,6 +71,7 @@ public class ProfilePage extends AppCompatActivity {
                 documentReference.update("vehiclenumber",vehiclenumber.getText().toString());
                 documentReference.update("aadhaarnumber",aadhar.getText().toString());
                 documentReference.update("dlno",dln.getText().toString());
+                //After updating the data the user is redirected to the HomePage
                 startActivity(new Intent(ProfilePage.this, HomePage.class));
             }
         });

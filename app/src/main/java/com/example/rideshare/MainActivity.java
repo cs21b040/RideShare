@@ -24,18 +24,20 @@ public class MainActivity extends AppCompatActivity {
         wel=findViewById(R.id.textview1);
         learning=findViewById(R.id.textview2);
         String s= FirebaseAuth.getInstance().getUid();
+        //Splash Screen
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
 
                 if(s!=null)
                 {
+                    //if the user is already logged in he is redirected to OptionsActivity
                     Intent intent =new Intent(MainActivity.this,OptionsActivity.class);
                     startActivity(intent);
                     finish();
                 }
                 else {
-
+                    //if the user is not logged in he is redirected to Login Activity
                     Intent splashintent=new Intent(MainActivity.this, Login.class);
                     startActivity(splashintent);
                     finish();

@@ -34,6 +34,7 @@ public class SignUpFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //initialize the below variables
         View view = inflater.inflate(R.layout.fragment_signup_tab, container, false);
         signup = view.findViewById(R.id.signup);
         name = view.findViewById(R.id.name);
@@ -47,19 +48,22 @@ public class SignUpFragment extends Fragment {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //when Signup button is clicked these fields are updated in Firebase Firestore
                 String username = name.getText().toString();
                 String useremail = email.getText().toString();
                 String userpassword = password.getText().toString();
                 String userpno = pno.getText().toString();
                 String useraadhaarnumber = aadhaarnumber.getText().toString();
-
+                //Ensuring every Field is non-Empty
                 if (username.isEmpty() || useremail.isEmpty() || userpassword.isEmpty()) {
                     Toast.makeText(getActivity(), "Please Enter All Details", Toast.LENGTH_SHORT).show();
                 }
+                //Ensuring Password is of minimum 6 characters
                 if(userpassword.length()<6) Toast.makeText(getActivity(), "Password should have minimum 6 characters", Toast.LENGTH_SHORT).show();
                 else {
                     auth.createUserWithEmailAndPassword(useremail, userpassword).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                         @Override
+                        //When the user is successfully created we are storing the data in Firebase Firestore
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Toast.makeText(getActivity(), "Account Created", Toast.LENGTH_SHORT).show();
@@ -87,6 +91,8 @@ public class SignUpFragment extends Fragment {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
+                                            //if task is successfull we are starting the OptionsActivity
+                                            // allowing user to choose whether he is a driver or a passenger
                                             startActivity(new Intent(getActivity(), OptionsActivity.class));
                                             getActivity().finish();
                                         } else {
@@ -95,6 +101,7 @@ public class SignUpFragment extends Fragment {
                                     }
                                 });
                             } else {
+                                //if task is not successfull we are displaying a toast message
                                 Toast.makeText(getActivity(), "SignUp Failed. Please Try Again", Toast.LENGTH_SHORT).show();
                             }
                         }

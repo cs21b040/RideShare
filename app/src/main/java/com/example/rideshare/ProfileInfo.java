@@ -26,6 +26,7 @@ public class ProfileInfo extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_info);
+        //initializing the variables
         dob=findViewById(R.id.dob);
         vehicletype=findViewById(R.id.vehicletype);
         vehiclenumber=findViewById(R.id.vehiclenumber);
@@ -33,12 +34,12 @@ public class ProfileInfo extends AppCompatActivity {
         dln=findViewById(R.id.dln);
         auth= FirebaseAuth.getInstance();
         fstore= FirebaseFirestore.getInstance();
+        //when user is using the app for the first time and want to share his ride these fields are updated in Firebase Firestore
         DocumentReference documentReference= fstore.collection("users").document(auth.getCurrentUser().getUid());
-
-
         saving.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //we ask him to update DateOfBirth, VehicleType, VehicleNumber, DrivingLicenseNumber for security Purposes
                 String userdob= dob.getText().toString();
                 String usertype= vehicletype.getText().toString();
                 String usernumber= vehiclenumber.getText().toString();
@@ -46,11 +47,12 @@ public class ProfileInfo extends AppCompatActivity {
                 if(userdob.isEmpty() || usertype.isEmpty() || usernumber.isEmpty() || userdln.isEmpty()){
                     Toast.makeText(ProfileInfo.this, "Please enter all the details", Toast.LENGTH_SHORT).show();
                 }
+                //these are updated in Firebase Firestore
                 documentReference.update("dob",userdob);
                 documentReference.update("vehicletype",usertype);
                 documentReference.update("vehiclenumber",usernumber);
                 documentReference.update("dlno",userdln);
-
+                //after updating the fields the user is redirected to OptionsActivity .
                 startActivity(new Intent(ProfileInfo.this,OptionsActivity.class));
                 finish();
             }
