@@ -70,24 +70,26 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HomePage extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
-
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-    Toolbar toolbar;
-    private GoogleMap map;
-    private Boolean mLocationPermissionsGranted = false;
-    Place src,dst;
+    //this class is used to create the Home Page
+    DrawerLayout drawerLayout; //drawer layout is added to get the navigation view from the Home Page
+    NavigationView navigationView; //navigation view "three bars on the top left side" in the Home Page
+    Toolbar toolbar;   //tool bar section in the Home Page
+    private GoogleMap map; //map section in the Home Page
+    private Boolean mLocationPermissionsGranted = false; //this variable is used to check if the location permission is granted or not
+    Place src,dst; //this variable is used to store the source and destination location
     Button button;
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    private FusedLocationProviderClient fusedLocationProviderClient; //fused location provider client is used to get the current location of the user
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
+            //this method is used to set the boundaries of the map
             new LatLng(-40, -168), new LatLng(71, 136));
-    private FirebaseAuth auth;
-    private FirebaseFirestore fstore;
+    private FirebaseAuth auth; //auth is used to get the current user
+    private FirebaseFirestore fstore; //firestore is used to store the data in the database
 
-    static List<Polyline> v;
+    static List<Polyline> v; //polyline is used to draw the route between the source and destination
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //this method is used to create the Home Page
         v=new LinkedList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
@@ -97,26 +99,27 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         navigationView = findViewById(R.id.nav_view);
         toolbar = findViewById(R.id.toolbar);
 
-        setSupportActionBar(toolbar);
-        navigationView.bringToFront();
+        setSupportActionBar(toolbar); //this method is used to set the toolbar in the Home Page
+        navigationView.bringToFront();//this method is used to bring the navigation view to the front
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(R.id.nav_home);
-        getLocationPermission();
+        drawerLayout.addDrawerListener(toggle); //this method is used to add the toggle to the drawer layout
+        toggle.syncState(); //this method is used to sync the toggle with the drawer layout
+        navigationView.setNavigationItemSelectedListener(this);//this method is used to set the navigation view listener
+        navigationView.setCheckedItem(R.id.nav_home);//this method is used to set the home page as the default page
+        getLocationPermission();//this method is used to get the location permission from the user
 
     }
 
     private void init() {
+        //this method is used to initialize the map and the autocomplete fragments
         Log.d(TAG, "initMap: initializing map");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(HomePage.this);
-        String apiKey = getString(R.string.my_api_key);
+        String apiKey = getString(R.string.my_api_key); //this variable is used to store the api key
         if(!Places.isInitialized()){
             Places.initialize(getApplicationContext(),apiKey);
         }
-        PlacesClient placesClient= Places.createClient(this);
+        PlacesClient placesClient= Places.createClient(this); //this method is used to create the places client
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         AutocompleteSupportFragment autocompleteFragment2 = (AutocompleteSupportFragment)
@@ -128,8 +131,10 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         autocompleteFragment2.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            //autocomplete fragment is used to get the source input from the user
             @Override
             public void onPlaceSelected(@NonNull Place place) {
+                //when the source is selected the geoLocate method is called
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
                 src=place;
@@ -142,6 +147,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             }
         });
         autocompleteFragment2.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            //autocomplete fragment2 is used to get the destination input from the user
             @Override
             public void onError(@androidx.annotation.NonNull Status status) {
                 Log.i(TAG, "An error occurred: " + status);
@@ -150,7 +156,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             @Override
             public void onPlaceSelected(@androidx.annotation.NonNull Place place) {
                 dst=place;
-            }
+            } //when the destination is selected the getDirection method is called
         });
 
         button=findViewById(R.id.button);
@@ -158,12 +164,13 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
             @Override
             public void onClick(View v) {
                 getDirection();
-            }
+            } //when the button is clicked the getDirection method is called
         });
 
     }
 
     private void getDirection(){
+        //this method is used to get the direction between the source and destination
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         boundsBuilder.include(src.getLatLng());
         boundsBuilder.include(dst.getLatLng());
@@ -172,6 +179,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         fetchAndDisplayRoute();
     }
     private void fetchAndDisplayRoute() {
+        //this method is used to get the route between the source and destination
         GeoApiContext context = new GeoApiContext.Builder()
                 .apiKey(getString(R.string.my_api_key)) // Replace with your API key
                 .build();
@@ -183,6 +191,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         ;
 
         req.setCallback(new PendingResult.Callback<DirectionsResult>() {
+            //this method is used to get the result of the route request
             @Override
             public void onResult(DirectionsResult result) {
                 runOnUiThread(() -> {
@@ -207,6 +216,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
 
     }
     void addToDatabase(Polyline polyline) {
+        //this method is used to add the route to the database
         String userId = auth.getCurrentUser().getEmail();
         List<LatLng> points = polyline.getPoints();
         HashMap<String, Object> path = new HashMap<>();
@@ -216,11 +226,13 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         path.put(userId, user);
         fstore.collection("paths").document(user.uid).set(path)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    //this method is used to check if the route is added to the database
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(HomePage.this, "Your ride is successfully shared", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
+                    //this method is used to check if the route is not added to the database
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(HomePage.this, "Error adding path to database", Toast.LENGTH_SHORT).show();
@@ -229,6 +241,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     }
 
     private void geoLocate() {
+        //this method is used to get the location of the source and destination
         Log.d(TAG, "geoLocate: geolocating");
         String searchString = src.getName();
         Geocoder geocoder = new Geocoder(HomePage.this);
@@ -247,7 +260,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed() {   //this method is used to close the navigation view when back button is pressed
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
         }
@@ -258,16 +271,20 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        //this method is used to navigate to different pages from the navigation view
         if (item.getItemId()==R.id.nav_home) {
+            //if home is selected in the navigation view then the user is taken to the home page
             Intent intent=new Intent (HomePage.this, OptionsActivity.class);
             startActivity(intent);
             finish();
         }
         else if(item.getItemId()==R.id.nav_profile) {
+            //if profile is selected in the navigation view then the user is taken to the profile page
             Intent intent=new Intent (HomePage.this, ProfilePage.class);
             startActivity(intent);
         }
         else if(item.getItemId()==R.id.nav_logout) {
+            //if logout is selected in the navigation view then the user is logged out and taken to the login page
             auth.signOut();
             Toast.makeText(this, "Log Out SuccessFull", Toast.LENGTH_SHORT).show();
             Intent intent1=new Intent(HomePage.this, Login.class);
@@ -277,6 +294,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         }
         else if(item.getItemId()==R.id.nav_trip)
         {
+            //if trip is selected in the navigation view then the user is taken to the trip details page
             Intent intent2=new Intent(HomePage.this, Travel_Details.class);
             startActivity(intent2);
         }
@@ -284,6 +302,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     }
 
     private void getDeviceLocation(){
+        //this method is used to get the current location of the user
         Log.d(TAG, "getDeviceLocation: getting the devices current location");
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -312,12 +331,14 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         }
     }
     private void moveCamera(LatLng latLng, float zoom,String title){
+        //this method is used to move the camera to the location specified by the user
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         MarkerOptions options=new MarkerOptions().position(latLng).title(title);
         map.addMarker(options);
     }
     public void onMapReady(GoogleMap googleMap) {
+        //this method is used to get the map ready
         Log.d(TAG, "onMapReady: map is ready");
         map = googleMap;
 
@@ -334,6 +355,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
         }
     }
     private void getLocationPermission() {
+        //this method is used to get the location permission from the user
         Log.d(TAG, "getLocationPermission: getting location permissions");
         String[] permissions = {android.Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -354,6 +376,7 @@ public class HomePage extends AppCompatActivity implements OnMapReadyCallback, N
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //this method is used to get the result of the permission request
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Log.d(TAG, "onRequestPermissionsResult: called.");
         mLocationPermissionsGranted = false;

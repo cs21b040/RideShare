@@ -52,32 +52,33 @@ import java.util.Map;
 import java.util.Vector;
 
 public class CustomerHomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-    Toolbar toolbar;
+    DrawerLayout drawerLayout; //drawer layout is added to get the navigation view from the Home Page
+    NavigationView navigationView; //navigation view "three bars on the top left side" in the Home Page
+    Toolbar toolbar; //tool bar section in the Home Page
 
     Button button;
-    private final double RADIUS_OF_EARTH=6378.1e3;
-    Place src,dst;
-    private FirebaseAuth auth;
-    private FirebaseFirestore fstore;
-    Vector<User> allpaths;
-    private LinearLayout linearLayout;
-    private ArrayList<String> arrayList,uid, userUid;
-    String custSrc="";
-    String custDst="";
-    String strAdd = "";
-    String strDst="";
+    private final double RADIUS_OF_EARTH=6378.1e3; //radius of earth in meters
+    Place src,dst; //this variable is used to store the source and destination location
+    private FirebaseAuth auth;//this variable is used to get the current user
+    private FirebaseFirestore fstore; //this variable is used to get the database
+    Vector<User> allpaths; //this variable is used to store all the paths from the database
+    private LinearLayout linearLayout; //this variable is used to add the scroll of text views in the linear layout
+    private ArrayList<String> arrayList,uid, userUid; //this variable is used to store the details of the driver
+    String custSrc=""; //store the source location of the customer
+    String custDst=""; //store the destination location of the customer
+    String strAdd = "";//store the source location of the driver
+    String strDst="";//store the destination location of the driver
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //this function is used to create the activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_home_page);
         drawerLayout = findViewById(R.id.drawer_layout1);
         navigationView = findViewById(R.id.nav_view1);
-        auth = FirebaseAuth.getInstance();
-        fstore = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance(); //get the current user
+        fstore = FirebaseFirestore.getInstance(); //get the database
         toolbar = findViewById(R.id.toolbar1);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar); //set the toolbar
         linearLayout=findViewById(R.id.linear_layout);
         navigationView.bringToFront();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -89,11 +90,11 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         uid=new ArrayList<>();
         userUid=new ArrayList<>();
         arrayList=new ArrayList<>();
-        retrieveAllPathsFromDatabase();
-        init();
+        retrieveAllPathsFromDatabase(); //this function is used to retrieve all the paths from the database
+        init(); //this function is used to initialize the activity
     }
     void init(){
-        String apiKey = getString(R.string.my_api_key);
+        String apiKey = getString(R.string.my_api_key); //get the api key
         if(!Places.isInitialized()){
             Places.initialize(getApplicationContext(),apiKey);
         }
@@ -102,8 +103,8 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setCountries("IN");
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG));
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,Place.Field.LAT_LNG)); //autocomplete fragment is used to get the source location
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() { //autocomplete fragment2 is used to get the destination location
             @Override
             public void onError(@androidx.annotation.NonNull Status status) {
                 Log.i(TAG, "An error occurred: " + status);
@@ -134,6 +135,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         });
         button=findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
+            //this function is used to check the path between the source and destination
             @Override
             public void onClick(View v) {
                 try {
@@ -145,6 +147,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         });
     }
     public double haversine(LatLng p1, LatLng p2) {
+        //this function is used to calculate the distance between two points
         double lat1 = p1.latitude;
         double lon1 = p1.longitude;
         double lat2 = p2.latitude;
@@ -156,13 +159,14 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
         return RADIUS_OF_EARTH * c;
     }
     void check() throws IOException {
+        //this function is used to check the path between the source and destination
         Log.i("CHECK SIZe", "check: v size is" + allpaths.size());
         arrayList.clear();
         if(allpaths.size()==0){
             Toast.makeText(this, "No Routes Available", Toast.LENGTH_SHORT).show();
         }
         if(allpaths.size()>0){
-            double total_dist=haversine(src.getLatLng(),dst.getLatLng());
+            double total_dist=haversine(src.getLatLng(),dst.getLatLng()); //calculate the distance between the source and destination
             for(int i=0;i<allpaths.size();i++){
                 double dist1=1e9;
                 double dist2=1e9;
@@ -174,13 +178,13 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                 }
                 Log.i("TOTALDIST", "check: "+dist1+" "+dist2+" "+total_dist);
                 if(dist1+dist2<=total_dist && dist1<=5000 && dist2<=5000){
-                    //show the driver in the list
+                    //show the possible drivers in the list
                     //remove this polyLine after completion
-                    Geocoder geocoder=new Geocoder(this, Locale.getDefault());
-                    LatLng l=allpaths.get(i).route.get(0);
-                    LatLng l2=allpaths.get(i).route.get(allpaths.get(i).route.size()-1);
+                    Geocoder geocoder=new Geocoder(this, Locale.getDefault()); //geocoder is used to get the address from the latitude and longitude
+                    LatLng l=allpaths.get(i).route.get(0); //get the source location of the driver
+                    LatLng l2=allpaths.get(i).route.get(allpaths.get(i).route.size()-1); //get the destination location of the driver
 
-
+                    //get the source and destination location of the driver
                     List<Address> addresses = geocoder.getFromLocation(l.latitude, l.longitude, 1);
                     List<Address> addresses1=geocoder.getFromLocation(l2.latitude,l2.longitude,1);
                     List<Address> addresses2=geocoder.getFromLocation(src.getLatLng().latitude,src.getLatLng().longitude,1);
@@ -225,8 +229,9 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                 }
             }
         }
-        linearLayout.removeAllViews();
+        linearLayout.removeAllViews(); //remove all the views from the linear layout initially when the button is clicked
         for (int k = 0; k < arrayList.size(); k++) {
+            //add the text views to the linear layout dynamically after getting  information data from the database
             TextView tv = new TextView(this);
             tv.setText(arrayList.get(k));
             tv.setTextSize(18);
@@ -245,9 +250,10 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
             TextView tv = findViewById(k);
             int finalK = k;
             tv.setOnClickListener(new View.OnClickListener() {
+                //this function is used to book the ride
                 @Override
                 public void onClick(View v) {
-
+                    //update the database with the details of the customer and driver
                     documentReference.update("costumerMail", auth.getCurrentUser().getEmail());
                     documentReference.update("from2", custSrc);
                     documentReference.update("to2",custDst);
@@ -261,7 +267,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
                     dr.update("from2", strAdd);
                     dr.update("to2", strDst);
                     Toast.makeText(CustomerHomePage.this, "The Ride is Successfully Booked.. Details in 'Your Trip'", Toast.LENGTH_SHORT).show();
-                    deleteFromDatabase(userId);
+                    deleteFromDatabase(userId);//delete the path from the database
                     startActivity(new Intent(CustomerHomePage.this, Travel_Details.class));
                 }
             });
@@ -271,15 +277,17 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
 
     void deleteFromDatabase(String uid){
         fstore.collection("paths").document(uid).delete();
-    }
+    } //this function is used to delete the path from the database
 
     void retrieveAllPathsFromDatabase() {
+        //this function is used to retrieve all the paths from the database
         Vector<User> allPaths = new Vector<>();
         fstore.collection("paths")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@androidx.annotation.NonNull Task<QuerySnapshot> task) {
+                        //onComplete method is used to get the data from the database
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Map<String,Object>m=document.getData();
@@ -314,6 +322,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onBackPressed() {
+        //this function is used to close the navigation view when the back button is pressed
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
         }
@@ -323,6 +332,7 @@ public class CustomerHomePage extends AppCompatActivity implements NavigationVie
     }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        //this function is used to navigate to the other pages when the navigation view is clicked
         if (item.getItemId()==R.id.nav_home1) {
             Intent intent=new Intent (CustomerHomePage.this, OptionsActivity.class);
             startActivity(intent);
